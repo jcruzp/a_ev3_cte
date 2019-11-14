@@ -8,6 +8,17 @@
 # RESPECT TO THESE MATERIALS, ALL WARRANTIES, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 # THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
 
+from ev3dev2.led import Leds
+from ev3dev2.motor import (OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D, MediumMotor, MoveTank,
+                           SpeedPercent)
+
+#from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
+from ev3dev2.sound import Sound
+#from ev3dev2.sensor.lego import InfraredSensor
+from ev3dev2.sensor.lego import UltrasonicSensor
+
+from ev3dev2.sensor.lego import ColorSensor
+
 import json
 import logging
 import random
@@ -16,16 +27,9 @@ import time
 from enum import Enum
 
 from agt import AlexaGadget
-from ev3dev2.led import Leds
-from ev3dev2.motor import (OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D, MediumMotor, MoveTank,
-                           SpeedPercent)
 
-from ev3dev2.sensor import INPUT_1, INPUT_2, INPUT_3, INPUT_4
-from ev3dev2.sound import Sound
-#from ev3dev2.sensor.lego import InfraredSensor
-from ev3dev2.sensor.lego import UltrasonicSensor
-
-from ev3dev2.sensor.lego import ColorSensor
+from color_arm import ColorArm
+from steering_wheel import SteeringWheel
 
 # Set the logging level to INFO to see messages from AlexaGadget
 logging.basicConfig(level=logging.INFO)
@@ -65,82 +69,6 @@ class EventName(Enum):
     SPEECH = "Speech"
 
 
-class SteeringWheel(self):
-    """
-    Move front wheels right and left like a steering wheel
-    """
-
-    def __init__(self):
-
-        self.steeringwheel = MediumMotor(OUTPUT_C)
-        self.leds = Leds()
-
-    def turnLeft(self):
-
-        self.leds.set_color("LEFT", "GREEN")
-        self.steeringwheel.on_for_rotations(SpeedPercent(100), 1)
-        self.leds.set_color("LEFT", "BLACK")
-
-    def turnRigth(self):
-
-        self.leds.set_color("RIGHT", "GREEN")
-        self.steeringwheel.on_for_rotations(SpeedPercent(100), -1)
-        self.leds.set_color("RIGHT", "BLACK")
-
-
-class ArmPosition(Enum):
-    """
-    List of color arm position
-    """
-    CONTRACT = "Contract"
-    STRETCH = "Stretch"
-
-class ColorScanOptions(Enum):
-    """
-    List of colors that could be scaned
-    """
-    NONE = "NoColor"
-    RED = "Red"
-    YELLOW = "Yellow"
-    BLUE = "Blue"
-
-class ColorArm(self):
-    """
-    Stretch the color arm to color scan and contract it at end 
-    """
-
-    def __init__(self):
-
-        self.leds = Leds()
-        self.armposition = ArmPosition.CONTRACT
-        self.colorarm = MediumMotor(OUTPUT_A)
-        self.colorsensor = ColorSensor(INPUT_1)
-        self.colorscaned = ColorScanOptions.NONE
-
-    def strechArm(self):
-
-        if self.armposition in ArmPosition.CONTRACT:
-            self.leds.set_color("LEFT", "YELLOW")
-            self.colorarm.on_for_rotations(
-                SpeedPercent(100), 1, brake=True, block=True)
-            self.leds.set_color("LEFT", "BLACK")
-            self.armposition = ArmPosition.STRETCH
-
-    def contractArm(self):
-
-        if self.armposition in ArmPosition.STRETCH:
-            self.leds.set_color("RIGHT", "YELLOW")
-            self.colorarm.on_for_rotations(
-                SpeedPercent(100), -1, brake=True, block=True)
-            self.leds.set_color("RIGHT", "BLACK")
-            self.armposition = ArmPosition.CONTRACT
-            
-    @property
-    def scanColor(self):
-        self.strechArm
-        self.colorscaned = self.colorsensor.color_name
-        self.contractArm
-        return self.colorscaned
 
 class MindstormsGadget(AlexaGadget):
     """
