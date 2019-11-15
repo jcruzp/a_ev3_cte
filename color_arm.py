@@ -43,7 +43,7 @@ class ColorArm():
         if self.arm_position in ArmPosition.CONTRACT:
             self.leds.set_color("LEFT", "YELLOW")
             self.color_arm.on_for_rotations(
-                SpeedPercent(100), 1, brake=True, block=True)
+                SpeedPercent(100), 32, brake=True, block=True)
             self.leds.set_color("LEFT", "BLACK")
             self.arm_position = ArmPosition.STRETCH
 
@@ -52,7 +52,7 @@ class ColorArm():
         if self.arm_position in ArmPosition.STRETCH:
             self.leds.set_color("RIGHT", "YELLOW")
             self.color_arm.on_for_rotations(
-                SpeedPercent(100), -1, brake=True, block=True)
+                SpeedPercent(100), -32, brake=True, block=True)
             self.leds.set_color("RIGHT", "BLACK")
             self.arm_position = ArmPosition.CONTRACT
             

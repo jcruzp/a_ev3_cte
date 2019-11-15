@@ -30,6 +30,8 @@ from agt import AlexaGadget
 
 from color_arm import ColorArm
 from steering_wheel import SteeringWheel
+from car_engine import CarEngine
+from scan_tower import ScanTower
 
 # Set the logging level to INFO to see messages from AlexaGadget
 logging.basicConfig(level=logging.INFO)
