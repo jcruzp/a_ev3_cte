@@ -17,13 +17,13 @@ class CarEngine():
     def move_forward(self):
 
         self.leds.set_color("LEFT", "ORANGE")
-        self.car_engine.on_for_rotations(SpeedPercent(100), 1)
+        self.car_engine.on_for_degrees(SpeedPercent(10), 90)
         self.leds.set_color("LEFT", "BLACK")
 
     def move_backward(self):
 
         self.leds.set_color("RIGHT", "ORANGE")
-        self.car_engine.on_for_rotations(SpeedPercent(100), -1)
+        self.car_engine.on_for_degrees(SpeedPercent(10), -90)
         self.leds.set_color("RIGHT", "BLACK")
 
     

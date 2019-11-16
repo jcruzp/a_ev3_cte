@@ -3,6 +3,7 @@
 # twitter: @joseacruzp
 from enum import Enum
 
+from ev3dev2.sound import Sound
 from ev3dev2.led import Leds
 from ev3dev2.motor import OUTPUT_A, MediumMotor, SpeedPercent
 
@@ -37,10 +38,11 @@ class ColorArm():
         self.color_arm = MediumMotor(OUTPUT_A)
         self.color_sensor = ColorSensor()
         self.color_scaned = ColorScanOptions.NONE
+        self.sound = Sound()
 
     def strech_arm(self):
 
-        if self.arm_position in ArmPosition.CONTRACT:
+        if self.arm_position == ArmPosition.CONTRACT:
             self.leds.set_color("LEFT", "YELLOW")
             self.color_arm.on_for_rotations(
                 SpeedPercent(100), 32, brake=True, block=True)
@@ -49,16 +51,19 @@ class ColorArm():
 
     def contract_arm(self):
 
-        if self.arm_position in ArmPosition.STRETCH:
+        if self.arm_position == ArmPosition.STRETCH:
             self.leds.set_color("RIGHT", "YELLOW")
             self.color_arm.on_for_rotations(
                 SpeedPercent(100), -32, brake=True, block=True)
             self.leds.set_color("RIGHT", "BLACK")
             self.arm_position = ArmPosition.CONTRACT
             
-    @property
     def scan_color(self):
         self.strech_arm()
         self.color_scaned = self.color_sensor.color_name
-        self.contract_arm
+        self.contract_arm()
         return self.color_scaned
+    
+    @property
+    def read_color(self):
+        return self.color_sensor.color_name

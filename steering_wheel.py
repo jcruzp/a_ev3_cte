@@ -1,6 +1,9 @@
 # Jose Cruz - 2019
 # email: joseacruzp@gmail.com
 # twitter: @joseacruzp
+
+from enum import Enum
+from ev3dev2.sound import Sound
 from ev3dev2.led import Leds
 from ev3dev2.motor import OUTPUT_D, MediumMotor, SpeedPercent
 
@@ -21,13 +24,14 @@ class SteeringWheel():
 
         self.steering_wheel = MediumMotor(OUTPUT_D)
         self.leds = Leds()
-        self.wheels_position = WheelsPosition.CENTER 
+        self.wheels_position = WheelsPosition.CENTER
+        self.sound = Sound()
 
     def turn_left(self):
 
         if self.wheels_position !=  WheelsPosition.LEFT:
             self.leds.set_color("LEFT", "GREEN")
-            self.steering_wheel.on_for_degrees(SpeedPercent(100), 90)
+            self.steering_wheel.on_for_degrees(SpeedPercent(25), -90)
             self.leds.set_color("LEFT", "BLACK")
             self.wheels_position = WheelsPosition.LEFT
 
@@ -35,18 +39,14 @@ class SteeringWheel():
 
         if self.wheels_position !=  WheelsPosition.RIGHT:
             self.leds.set_color("RIGHT", "GREEN")
-            self.steering_wheel.on_for_degrees(SpeedPercent(100), -90)
+            self.steering_wheel.on_for_degrees(SpeedPercent(25), 90)
             self.leds.set_color("RIGHT", "BLACK")
             self.wheels_position = WheelsPosition.RIGHT
             
     def turn_center(self):
         
         if self.wheels_position ==  WheelsPosition.RIGHT:
-            self.leds.set_color("RIGHT", "GREEN")
-            self.steering_wheel.on_for_degrees(SpeedPercent(100), 90)
-            self.leds.set_color("RIGHT", "BLACK")
+            self.turn_left()
         elif self.wheels_position ==  WheelsPosition.LEFT:
-            self.leds.set_color("RIGHT", "GREEN")
-            self.steering_wheel.on_for_degrees(SpeedPercent(100), -90)
-            self.leds.set_color("RIGHT", "BLACK")
+            self.turn_rigth()
         self.wheels_position = WheelsPosition.CENTER
