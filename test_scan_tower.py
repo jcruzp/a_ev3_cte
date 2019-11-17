@@ -18,7 +18,7 @@ from scan_tower import ScanTower
 if __name__ == '__main__':
     # Startup sequence
     gadget = ScanTower()
-    gadget.sound.play_song((('C4', 'e'), ('D4', 'e'), ('E5', 'q')))
+    #gadget.sound.play_song((('C4', 'e'), ('D4', 'e'), ('E5', 'q')))
     gadget.leds.set_color("LEFT", "BLACK")
     gadget.leds.set_color("RIGHT", "BLACK")
     gadget.scan_field()
