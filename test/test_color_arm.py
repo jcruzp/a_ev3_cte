@@ -7,25 +7,17 @@
 
 import os
 import sys
-from time import sleep
+import time
 import logging
 
-from steering_wheel import SteeringWheel 
+from ..libs.color_arm import ColorArm
 
 if __name__ == '__main__':
     # Startup sequence
-    gadget = SteeringWheel()
+    gadget = ColorArm()
     #gadget.sound.play_song((('C4', 'e'), ('D4', 'e'), ('E5', 'q')))
     gadget.leds.set_color("LEFT", "BLACK")
     gadget.leds.set_color("RIGHT", "BLACK")
-    gadget.turn_rigth()
-    sleep(5)
-    gadget.turn_center()
-    sleep(5)
-    gadget.turn_left()
-    sleep(5)
-    gadget.turn_center()
-    
-    
+    print(gadget.scan_color())
     
     

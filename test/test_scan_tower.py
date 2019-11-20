@@ -10,7 +10,7 @@ import sys
 import time
 import logging
 
-from scan_tower import ScanTower 
+from ..libs.scan_tower import ScanTower 
 
 if __name__ == '__main__':
     # Startup sequence

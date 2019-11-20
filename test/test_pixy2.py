@@ -1,12 +1,21 @@
 #!/usr/bin/env python3
+# Jose Cruz - 2019
+# email: joseacruzp@gmail.com
+# twitter: @joseacruzp
+# github:  https://github.com/Jcruzp
+# website: https://sites.google.com/view/raeiot
+
+import logging
 from ev3dev2.display import Display
 from ev3dev2.sensor import INPUT_1
 from ev3dev2.sensor.lego import TouchSensor
 
 from time import sleep
-from pixy2_cam import Pixy2Cam #, DataCam
+from ..libs.pixy2_cam import Pixy2Cam #, DataCam
 
+logging.basicConfig(level=logging.INFO)
 
+logging.info('Initializing all objects...')
 # EV3 Display
 lcd = Display()
 
@@ -15,9 +24,11 @@ ts = TouchSensor(INPUT_1)
 
 pixy2=Pixy2Cam()
 
+logging.info('Turn on cam leds...')
 #turn leds On
 pixy2.set_leds(1)
 
+logging.info('Scanning field search color towers...')
 # Read and display data until TouchSensor is pressed
 while not ts.value():
     # Clear display
@@ -57,3 +68,4 @@ while not ts.value():
     
 #turn leds On
 pixy2.set_leds()
+logging.info('Shutdown...')
