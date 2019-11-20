@@ -1,6 +1,8 @@
 # Jose Cruz - 2019
 # email: joseacruzp@gmail.com
 # twitter: @joseacruzp
+# github:  https://github.com/Jcruzp
+# website: https://sites.google.com/view/raeiot
 from enum import Enum
 from time import sleep
 import threading

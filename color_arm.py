@@ -1,6 +1,8 @@
 # Jose Cruz - 2019
 # email: joseacruzp@gmail.com
 # twitter: @joseacruzp
+# github:  https://github.com/Jcruzp
+# website: https://sites.google.com/view/raeiot
 from enum import Enum
 
 from ev3dev2.sound import Sound
