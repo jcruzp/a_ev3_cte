@@ -14,5 +14,5 @@ Output_D = Steering Wheel Medium Motor - Green Leds
 Input_1 = Color
 Input_2 = Temperature
 Input_3 = Gyroscope
-Input_4 = Ultrasonic
+Input_4 = Pixy2   (Ultrasonic)
 

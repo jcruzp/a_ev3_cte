@@ -4,7 +4,7 @@ from ev3dev2.sensor import INPUT_1
 from ev3dev2.sensor.lego import TouchSensor
 
 from time import sleep
-from pixy2_cam import Pixy2Cam, DataCam
+from pixy2_cam import Pixy2Cam #, DataCam
 
 
 # EV3 Display
@@ -25,11 +25,17 @@ while not ts.value():
     
     data_cam=pixy2.find_object(1)
      
-    sig =data_cam.sig
-    x = data_cam.x
-    y = data_cam.y
-    w = data_cam.w
-    h =data_cam.h
+    # sig =data_cam.sig
+    # x = data_cam.x
+    # y = data_cam.y
+    # w = data_cam.w
+    # h =data_cam.h
+    
+    sig =data_cam['sig']
+    x = data_cam['x']
+    y = data_cam['y']
+    w = data_cam['w']
+    h = data_cam['h']
     # Scale to resolution of EV3 display:
     # Resolution Pixy2 while color tracking; (316x208)
     # Resolution EV3 display: (178x128)
