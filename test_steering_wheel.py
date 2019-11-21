@@ -10,7 +10,7 @@ import sys
 from time import sleep
 import logging
 
-from ..libs.steering_wheel import SteeringWheel 
+from libs.steering_wheel import SteeringWheel 
 
 if __name__ == '__main__':
     # Startup sequence

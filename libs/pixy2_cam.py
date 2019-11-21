@@ -13,15 +13,6 @@ from ev3dev2.port import LegoPort
 from smbus import SMBus
 from time import sleep
 
-# class DataCam():
-      
-#     def __init__(self):
-#         self.sig=0
-#         self.x=0
-#         self.y=0
-#         self.w=0
-#         self.h=0   
-
 class Pixy2Cam():
     """
     Control Pixy2 cam at top of tower
@@ -50,14 +41,7 @@ class Pixy2Cam():
         self.lego_bus.write_i2c_block_data(self.address, 0, data)
         # Read block
         block = self.lego_bus.read_i2c_block_data(self.address, 0, 20)
-        # Extract data
-        #data_cam=DataCam()
-        #data_cam.sig = block[7]*256 + block[6]
-        #data_cam.x = block[9]*256 +  block[8]
-        #data_cam.y = block[11]*256 +  block[10]
-        #data_cam.w = block[13]*256 +  block[12]
-        #data_cam.h = block[15]*256 +  block[14]
-        
+            
         data_cam={}
         data_cam['sig'] = block[7]*256 + block[6]
         data_cam['x'] = block[9]*256 +  block[8]

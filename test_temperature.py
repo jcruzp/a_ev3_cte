@@ -10,14 +10,14 @@ import sys
 import time
 import logging
 
-from ..libs.scan_tower import ScanTower 
+from time import sleep
+from libs.temperature import TemperatureSensor
 
 if __name__ == '__main__':
     # Startup sequence
-    gadget = ScanTower()
-    #gadget.sound.play_song((('C4', 'e'), ('D4', 'e'), ('E5', 'q')))
-    gadget.leds.set_color("LEFT", "BLACK")
-    gadget.leds.set_color("RIGHT", "BLACK")
-    gadget.scan_field()
+    gadget = TemperatureSensor()
+    while True:
+        print(gadget.read_temperature())
+        sleep(1)
     
     

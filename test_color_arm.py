@@ -10,7 +10,7 @@ import sys
 import time
 import logging
 
-from ..libs.color_arm import ColorArm
+from libs.color_arm import ColorArm
 
 if __name__ == '__main__':
     # Startup sequence
