@@ -17,7 +17,7 @@ if __name__ == '__main__':
     # Startup sequence
     gadget = TemperatureSensor()
     while True:
-        print(gadget.read_temperature())
+        print('Temperature: {0:0.2f} *C'.format(gadget.read_temperature_c()))
         sleep(1)
     
     

@@ -23,14 +23,25 @@ class TemperatureSensor():
         lego_port = LegoPort(INPUT_2)
         lego_port.mode = 'other-i2c'
         sleep(0.5)
-        # Settings for I2C (SMBus(3) for INPUT_4)
+        # Settings for I2C (SMBus(4) for INPUT_2)
         self.lego_bus =  SMBus(4)
-        # Make sure the same address is set in Pixy2
+        # LM75 address
         self.address = 0x4C
 
-    def read_temperature(self):
-        block = self.lego_bus.read_i2c_block_data(self.address, 0, 1)  
-        return block
+    def read_temperature_c(self):
+        #block = self.lego_bus.read_i2c_block_data(self.address, 0, 1) 
+        # 
+        # 
+        # data = bus.read_i2c_block_data(0x48, 0)
+        #        TempMSB = data[0]
+        #        TempLSB = data[1]
+        # Read I2C data and calculate temperature
+        raw = self.lego_bus.read_word_data(self.address, 0) & 0xFFFF
+        raw = ((raw << 8) & 0xFF00) + (raw >> 8)
+        return (raw / 32.0) / 8.0
+
+    def to_fahrenheit(self, temp):
+		return (temp * (9.0/5.0)) + 32.0
 
 
     

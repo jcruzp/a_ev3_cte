@@ -20,13 +20,13 @@ class Pixy2Cam():
     
     def __init__(self):
           
-        # Set LEGO port for Pixy2 on input port 1
+        # Set LEGO port for Pixy2 on input port 4
         lego_port = LegoPort(INPUT_4)
         lego_port.mode = 'other-i2c'
         sleep(0.5)
-        # Settings for I2C (SMBus(3) for INPUT_4)
+        # Settings for I2C (SMBus(6) for INPUT_4)
         self.lego_bus =  SMBus(6)
-        # Make sure the same address is set in Pixy2
+        # Pixy2 address
         self.address = 0x54 
 
     def set_leds(self, turn=0):
