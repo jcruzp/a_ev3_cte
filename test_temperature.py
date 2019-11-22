@@ -18,6 +18,7 @@ if __name__ == '__main__':
     gadget = TemperatureSensor()
     while True:
         print('Temperature: {0:0.2f} *C'.format(gadget.read_temperature_c()))
+        print('Temperature: {0:0.2f} *F'.format(gadget.to_fahrenheit(gadget.read_temperature_c())))
         sleep(1)
     
     
