@@ -29,18 +29,25 @@ class Pixy2Cam():
         # Pixy2 address
         self.address = 0x54 
 
-    def set_leds(self, turn=0):
-        data = [174, 193, 22, 2, turn , 0]
+    def turn_lamp_on(self):
+        data = [174, 193, 22, 2, 1 , 0]
         self.lego_bus.write_i2c_block_data(self.address, 0, data)
-        block = self.lego_bus.read_i2c_block_data(self.address, 0, 10)  
+        sleep(0.1)
+              
+    def turn_lamp_off(self):
+        data = [174, 193, 22, 2, 0 , 0]
+        self.lego_bus.write_i2c_block_data(self.address, 0, data)
+        sleep(0.1)
       
     def find_object(self, signature=1):
         # Data for requesting block
         data = [174, 193, 32, 2, signature, 1]
         # Request block
         self.lego_bus.write_i2c_block_data(self.address, 0, data)
+        sleep(0.1)
         # Read block
         block = self.lego_bus.read_i2c_block_data(self.address, 0, 20)
+        sleep(0.1)
             
         data_cam={}
         data_cam['sig'] = block[7]*256 + block[6]

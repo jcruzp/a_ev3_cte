@@ -26,10 +26,12 @@ pixy2=Pixy2Cam()
 
 logging.info('Turn on cam leds...')
 #turn leds On
-pixy2.set_leds(1)
+pixy2.turn_lamp_on()
 
 logging.info('Scanning field search color towers...')
 # Read and display data until TouchSensor is pressed
+#data_cam=pixy2.find_object(2)
+#data_cam=pixy2.find_object(2)
 while not ts.value():
     # Clear display
     lcd.clear()
@@ -41,6 +43,11 @@ while not ts.value():
     y = data_cam['y']
     w = data_cam['w']
     h = data_cam['h']
+    
+    logging.info("X:" + str(x))
+    logging.info("Y:" + str(y))
+    logging.info("W:" + str(w))
+    logging.info("H:" + str(h))
     # Scale to resolution of EV3 display:
     # Resolution Pixy2 while color tracking; (316x208)
     # Resolution EV3 display: (178x128)
@@ -60,6 +67,6 @@ while not ts.value():
     # Update display to how rectangle
     lcd.update()
     
-#turn leds On
-pixy2.set_leds()
+#turn leds Off
+pixy2.turn_lamp_off()
 logging.info('Shutdown...')
