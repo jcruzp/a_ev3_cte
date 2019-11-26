@@ -13,6 +13,12 @@ from ev3dev2.port import LegoPort
 from smbus import SMBus
 from time import sleep
 
+class SignatureColor(Enum):
+    NONE = 0
+    RED = 1
+    BLUE = 2
+    YELLOW = 3
+
 class Pixy2Cam():
     """
     Control Pixy2 cam at top of tower
@@ -39,7 +45,7 @@ class Pixy2Cam():
         self.lego_bus.write_i2c_block_data(self.address, 0, data)
         sleep(0.1)
       
-    def find_object(self, signature=1):
+    def find_object(self, signature=SignatureColor.RED):
         # Data for requesting block
         data = [174, 193, 32, 2, signature, 1]
         # Request block
@@ -57,4 +63,19 @@ class Pixy2Cam():
         data_cam['h'] = block[15]*256 +  block[14]
         return data_cam
 
-
+    def object_distance(self, object_width=1):
+        """
+        Calculte object distance in inches based on camera focal length.
+        W know width of object 
+        D know distance from camera before take a picture
+        P know width in pixeles of object at distance D
+        F = (P x D) / W
+        D = (W x F) / P
+        :param object_width: width in pixeles for object detected by signature
+        """
+        W = 1 # 1 inche tower width
+        D = 12 # 12 inches distance form tower to cam before take a picture
+        P = 22 # at 12 inches the 1 inch tower width see with 22 pixeles in cam image
+        F = (P * D) / W
+        D = (W * F) / object_width # object_width is new P object width
+        return D

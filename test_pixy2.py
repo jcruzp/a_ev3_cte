@@ -11,7 +11,7 @@ from ev3dev2.sensor import INPUT_1
 from ev3dev2.sensor.lego import TouchSensor
 
 from time import sleep
-from libs.pixy2_cam import Pixy2Cam
+from libs.pixy2_cam import Pixy2Cam, SignatureColor
 
 logging.basicConfig(level=logging.INFO)
 
@@ -36,7 +36,7 @@ while not ts.value():
     # Clear display
     lcd.clear()
     
-    data_cam=pixy2.find_object(1)
+    data_cam=pixy2.find_object(SignatureColor.RED)
       
     sig =data_cam['sig']
     x = data_cam['x']

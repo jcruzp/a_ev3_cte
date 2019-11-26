@@ -5,27 +5,31 @@
 # website: https://sites.google.com/view/raeiot
 from ev3dev2.led import Leds
 from ev3dev2.motor import OUTPUT_C, LargeMotor, SpeedPercent
+from libs.steering_wheel import SteeringWheel
 
-class CarEngine():
+class CarEngine(SteeringWheel):
     """
     Move Bot forward and backward
     """
 
     def __init__(self):
 
+        SteeringWheel.__init__(self)
         self.car_engine = LargeMotor(OUTPUT_C)
         self.leds = Leds()
 
-    def move_forward(self):
+    def move_forward(self, degrees=90):
 
         self.leds.set_color("LEFT", "ORANGE")
-        self.car_engine.on_for_degrees(SpeedPercent(10), 90)
+        self.car_engine.on_for_degrees(SpeedPercent(20), degrees,brake=False)
         self.leds.set_color("LEFT", "BLACK")
 
     def move_backward(self):
 
         self.leds.set_color("RIGHT", "ORANGE")
-        self.car_engine.on_for_degrees(SpeedPercent(10), -90)
+        self.car_engine.on_for_degrees(SpeedPercent(10), -90,brake=False)
         self.leds.set_color("RIGHT", "BLACK")
+        
+   
 
     
