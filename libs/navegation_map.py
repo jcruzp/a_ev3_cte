@@ -10,7 +10,8 @@ import logging
 
 from libs.pixy2_cam import Pixy2Cam, SignatureColor
 from libs.car_engine import CarEngine
-from libs.steering_wheel import SteeringWheel
+from libs.scan_tower import ScanTower
+from libs.color_arm import ColorArm
 
 logging.basicConfig(level=logging.INFO)
 
@@ -21,11 +22,26 @@ logging.info('Initializing all objects...')
 # pixel position between MIN and MAX tower at center (pixel 156 is the center because pixy2cam is 312 x 208 resolution
 MIN_LEFT = 140 
 MAX_RIGHT = 172
+MAX_INCHES_TOWER = 1.5
+
+pixy2 = Pixy2Cam()
 
 class TowerData():
-    def __init__(self, color, x):
+    def __init__(self, color):
         self.color = color
-        self.coord_x = x
+        data_cam=pixy2.find_object( color)
+        self.coord_x = data_cam['x']
+
+    def new_position(self):
+        data_cam=pixy2.find_object( self.color)
+        coord_move = data_cam['x']
+        return coord_move
+
+    def width(self):
+        data_cam=pixy2.find_object( self.color)
+        width = data_cam['w']
+        return width
+       
         
 
 class NavegationMap():
@@ -35,49 +51,74 @@ class NavegationMap():
     
     def __init__(self):
         logging.info('Initializing tower objects...')
-        self.pix2cam = Pixy2Cam()
         self.bot = CarEngine()
-        self.bot_wheel = SteeringWheel()
-        self.tower_1 = TowerData(SignatureColor.NONE,0)
-        self.tower_2 = TowerData(SignatureColor.NONE,0)
-        self.tower_3 = TowerData(SignatureColor.NONE,0)
-        
-        
+        self.scan_tower = ScanTower()
+        self.color_arm = ColorArm() 
+                 
     
     def scan_finding_towers(self):
         
-        pixy2=Pixy2Cam()
-
         logging.info('Turn on cam leds...')
         #turn leds On
         pixy2.turn_lamp_on()
 
         logging.info('Scanning tower red...')
-        self.tower_1.color=SignatureColor.RED
-        data_cam=pixy2.find_object( self.tower_1.color)
-        self.tower_1.x=data_cam['x']
-        logging.info('Tower red at :' + str(tower_1.x))
+        self.tower_red = TowerData(SignatureColor.RED) 
+        logging.info('Tower red at X:' + str(tower_red.x))
         
         logging.info('Scanning tower blue...')
-        self.tower_2.color=SignatureColor.BLUE
-        data_cam=pixy2.find_object( self.tower_2.color)
-        self.tower_2.x=data_cam['x'] 
-        logging.info('Tower blue at :' + str(tower_2.x))
+        self.tower_blue = TowerData(SignatureColor.BLUE) 
+        logging.info('Tower blue at X:' + str(tower_blue.x))
         
         logging.info('Scanning tower yellow...')
-        self.tower_3.color=SignatureColor.YELLOW
-        data_cam=pixy2.find_object( self.tower_3.color)
-        self.tower_3.x=data_cam['x']
-        logging.info('Tower yellow at :' + str(tower_3.x))
+        self.tower_yellow = TowerData(SignatureColor.YELLOW) 
+        logging.info('Tower yellow at X:' + str(tower_yellow.x))
         
         logging.info('Turn off cam leds...')
         #turn leds On
         pixy2.turn_lamp_off()
+
+
+    def go_tower_red(self):
+        """
+        |
+        |
+        _____
+             |
+             |
+        """
+        go_left()
+        # turn scan tower right to mantain object scan active
+        self.scan_tower.turn_right()
+        # turn lamp on
+        pixy2.turn_lamp_on()
+        # move forward until tower is between range
+        while tower_red.new_position()<MIN_LEFT:
+            self.bot.move_forward()
+        go_right()
+        # turn scan tower right to mantain object scan active
+        self.scan_tower.turn_left()
+        # bot move until arrive at tower position
+        while pixy2.object_distance(tower_red.width())>MAX_INCHES_TOWER:
+            self.bot.move_forward()
+        # turn lamp on
+        pixy2.turn_lamp_off()    
+        #Scan and verify tower color
+        print(color_arm.scan_color())
+        
         
         
     def go_right(self):
-        self.bot.move_forward()
         self.bot_wheel.turn_rigth()
+        self.bot.move_forward()
+        self.bot.move_forward()
+        self.bot.move_forward()
+        self.bot.move_forward()
+
+    def go_left(self):
+        self.bot_wheel.turn_left()
+        self.bot.move_forward()
+        self.bot.move_forward()
         self.bot.move_forward()
         self.bot.move_forward()
         

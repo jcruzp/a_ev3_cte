@@ -3,7 +3,7 @@
 # twitter: @joseacruzp
 # github:  https://github.com/Jcruzp
 # website: https://sites.google.com/view/raeiot
-from ev3dev2.led import Leds
+
 from ev3dev2.motor import OUTPUT_C, LargeMotor, SpeedPercent
 from libs.steering_wheel import SteeringWheel
 
@@ -16,7 +16,7 @@ class CarEngine(SteeringWheel):
 
         SteeringWheel.__init__(self)
         self.car_engine = LargeMotor(OUTPUT_C)
-        self.leds = Leds()
+     
 
     def move_forward(self, degrees=90):
 
