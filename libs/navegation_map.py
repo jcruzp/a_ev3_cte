@@ -37,7 +37,7 @@ class TowerData():
         coord_move = data_cam['x']
         return coord_move
 
-    def width(self):
+    def pixeles_width(self):
         data_cam=pixy2.find_object( self.color)
         width = data_cam['w']
         return width
@@ -99,7 +99,7 @@ class NavegationMap():
         # turn scan tower right to mantain object scan active
         self.scan_tower.turn_left()
         # bot move until arrive at tower position
-        while pixy2.object_distance(tower_red.width())>MAX_INCHES_TOWER:
+        while pixy2.object_distance(tower_red.pixeles_width())>MAX_INCHES_TOWER:
             self.bot.move_forward()
         # turn lamp on
         pixy2.turn_lamp_off()    

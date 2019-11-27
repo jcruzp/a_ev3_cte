@@ -20,11 +20,11 @@ if __name__ == '__main__':
     gadget.leds.set_color("RIGHT", "BLACK")
     gadget.turn_rigth()
     sleep(5)
-    #gadget.turn_center()
-    #sleep(5)
-    #gadget.turn_left()
-    #sleep(5)
-    #gadget.turn_center()
+    gadget.turn_center()
+    sleep(5)
+    gadget.turn_left()
+    sleep(5)
+    gadget.turn_center()
     
     
     

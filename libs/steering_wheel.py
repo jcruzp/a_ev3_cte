@@ -34,10 +34,10 @@ class SteeringWheel():
 
         if self.wheels_position !=  WheelsPosition.LEFT:
             self.leds.set_color("LEFT", "GREEN")
-            #self.steering_wheel.on_for_degrees(SpeedPercent(25), -90)
+            self.steering_wheel.on_for_degrees(SpeedPercent(25), -90)
             
-            self.steering_wheel.on(SpeedPercent(25)*-1)
-            self.steering_wheel.wait_until_not_moving()
+            #self.steering_wheel.on(SpeedPercent(25)*-1)
+            #self.steering_wheel.wait_until_not_moving()
 
             self.leds.set_color("LEFT", "BLACK")
             self.wheels_position = WheelsPosition.LEFT
@@ -46,10 +46,10 @@ class SteeringWheel():
 
         if self.wheels_position !=  WheelsPosition.RIGHT:
             self.leds.set_color("RIGHT", "GREEN")
-            #self.steering_wheel.on_for_degrees(SpeedPercent(25), 90)
+            self.steering_wheel.on_for_degrees(SpeedPercent(25), 90)
 
-            self.steering_wheel.on(SpeedPercent(25))
-            self.steering_wheel.wait_until_not_moving()
+            #self.steering_wheel.on(SpeedPercent(25))
+            #self.steering_wheel.wait_until_not_moving()
 
             self.leds.set_color("RIGHT", "BLACK")
             self.wheels_position = WheelsPosition.RIGHT
@@ -57,9 +57,9 @@ class SteeringWheel():
     def turn_center(self):
         
         if self.wheels_position ==  WheelsPosition.RIGHT:
-            self.steering_wheel.on_for_degrees(SpeedPercent(25), -90)
-            #self.turn_left()
+            #self.steering_wheel.on_for_degrees(SpeedPercent(25), -90)
+            self.turn_left()
         elif self.wheels_position ==  WheelsPosition.LEFT:
-            self.steering_wheel.on_for_degrees(SpeedPercent(25), 90)
-            #self.turn_rigth()
+            #self.steering_wheel.on_for_degrees(SpeedPercent(25), 90)
+            self.turn_rigth()
         self.wheels_position = WheelsPosition.CENTER
