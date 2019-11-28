@@ -4,13 +4,10 @@
 # github:  https://github.com/Jcruzp
 # website: https://sites.google.com/view/raeiot
 from ev3dev2.sensor import INPUT_2
-from ev3dev2.sensor.lego import TouchSensor
 from ev3dev2.port import LegoPort
 
 from time import sleep
 from smbus import SMBus
-from ev3dev2.led import Leds
-from ev3dev2.motor import OUTPUT_C, LargeMotor, SpeedPercent
 
 class TemperatureSensor():
     """
@@ -36,4 +33,8 @@ class TemperatureSensor():
 
     def to_fahrenheit(self, temp):
         temp = (temp * (9.0/5.0)) + 32.0
+        return temp
+
+    def read_temperature_f(self):
+        temp = to_fahrenheit(read_temperature_c)
         return temp
