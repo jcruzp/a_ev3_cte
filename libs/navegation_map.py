@@ -19,7 +19,7 @@ from libs.temperature import TemperatureSensor
 MIN_LEFT = 140
 MAX_RIGHT = 172
 # Max inches from bot to arrives tower
-MAX_INCHES_TOWER = 1.5
+MAX_INCHES_TOWER = 5
 
 pixy2 = Pixy2Cam()
 logging.basicConfig(level=logging.INFO)
@@ -57,7 +57,7 @@ class NavegationMap():
     Navegation map for Bot
     """
 
-    def __init__(self, tower_order_list=[ColorScanOptions.RED, ColorScanOptions.BLUE, ColorScanOptions.YELLOW]):
+    def __init__(self, tower_order_list=[ColorScanOptions.RED.value, ColorScanOptions.BLUE.value, ColorScanOptions.YELLOW.value]):
         logging.info('Initializing navegation map ...')
         self.bot = CarEngine()
         self.scan_tower = ScanTower()
@@ -77,16 +77,16 @@ class NavegationMap():
         pixy2.turn_lamp_on()
 
         logging.info('Scanning tower red...')
-        self.tower_red = TowerData(SignatureColor.RED)
-        logging.info('Tower red at X:' + str(tower_red.x))
+        self.tower_red = TowerData(SignatureColor.RED.value)
+        logging.info('Tower red at X:' + str(self.tower_red.coord_x))
 
         logging.info('Scanning tower blue...')
-        self.tower_blue = TowerData(SignatureColor.BLUE)
-        logging.info('Tower blue at X:' + str(tower_blue.x))
+        self.tower_blue = TowerData(SignatureColor.BLUE.value)
+        logging.info('Tower blue at X:' + str(self.tower_blue.coord_x))
 
-        logging.info('Scanning tower yellow...')
-        self.tower_yellow = TowerData(SignatureColor.YELLOW)
-        logging.info('Tower yellow at X:' + str(tower_yellow.x))
+        #logging.info('Scanning tower yellow...')
+        #self.tower_yellow = TowerData(SignatureColor.YELLOW.value)
+        #logging.info('Tower yellow at X:' + str(self.tower_yellow.coord_x))
 
         logging.info('Turn off cam leds...')
         # turn leds Off
@@ -96,17 +96,16 @@ class NavegationMap():
         """
         Move forward until arrive at tower position
         """
-        logging.info('Arriving tower color ' + tower_color.color)
+        logging.info('Arriving tower color ' + str(tower_color.color))
         self.steps_forward = 0
         # bot move until arrive at tower position
         while pixy2.object_distance(tower_color.pixeles_width()) > MAX_INCHES_TOWER:
+            logging.info('Distance...' + str(pixy2.object_distance(tower_color.pixeles_width())))   
             self.bot.move_forward()
             self.steps_forward += 1
         # turn lamp off
         pixy2.turn_lamp_off()
-        # Scan and verify tower color
-        logging.info('Verifying tower color ...' + self.color_arm.scan_color())
-        # print(color_arm.scan_color())
+        
 
     def go_right(self, backward=False):
         """
@@ -119,8 +118,16 @@ class NavegationMap():
             self.bot.move_backward()
             self.bot.move_backward()
             self.bot.move_backward()
+            self.bot.move_backward()
+            self.bot.move_backward()
+            self.bot.move_backward()
+            self.bot.move_backward()
         else:
             logging.info('Going right forward...')
+            self.bot.move_forward()
+            self.bot.move_forward()
+            self.bot.move_forward()
+            self.bot.move_forward()
             self.bot.move_forward()
             self.bot.move_forward()
             self.bot.move_forward()
@@ -137,8 +144,16 @@ class NavegationMap():
             self.bot.move_backward()
             self.bot.move_backward()
             self.bot.move_backward()
+            self.bot.move_backward()
+            self.bot.move_backward()
+            self.bot.move_backward()
+            self.bot.move_backward()
         else:
             logging.info('Going left forward...')
+            self.bot.move_forward()
+            self.bot.move_forward()
+            self.bot.move_forward()
+            self.bot.move_forward()
             self.bot.move_forward()
             self.bot.move_forward()
             self.bot.move_forward()
@@ -162,6 +177,7 @@ class NavegationMap():
             self.bot.move_forward()
             self.steps_left += 1
         self.go_right()
+        self.bot.turn_center()
         # turn scan tower right to mantain object scan active
         self.scan_tower.turn_left()
         self.go_until_near_tower(self.tower_red)
@@ -179,6 +195,7 @@ class NavegationMap():
             self.bot.move_backward()
             self.steps_left -= 1
         self.go_left(backward=True)
+        self.bot.turn_center()
         logging.info('Arriving to base...')
 
     def go_blue_tower(self):
@@ -221,6 +238,7 @@ class NavegationMap():
             self.bot.move_forward()
             self.steps_right += 1
         self.go_left()
+        self.bot.turn_center()
         # turn scan tower right to mantain object scan active
         self.scan_tower.turn_right()
         self.go_until_near_tower(self.tower_yellow)
@@ -238,6 +256,7 @@ class NavegationMap():
             self.bot.move_backward()
             self.steps_right -= 1
         self.go_right(backward=True)
+        self.bot.turn_center()
         logging.info('Arriving to base...')
 
     def exploring_towers(self):
@@ -249,17 +268,21 @@ class NavegationMap():
         self.scan_finding_towers()
         # Go and scan each tower in established order
         for tower in self.tower_order_list:
-            if tower == ColorScanOptions.RED:
+            logging.info('Go tower...' + tower)
+            if tower == ColorScanOptions.RED.value:
                 self.go_red_tower()
                 # Scan all we need using sensors
+                # Scan and verify tower color
+               # logging.info('Verifying tower color ...' + self.color_arm.scan_color())
+                # print(color_arm.scan_color())
                 self.tower_red.temperature = self.temperature.read_temperature_f()
                 self.return_from_red_tower()
-            elif tower == ColorScanOptions.BLUE:
+            elif tower == ColorScanOptions.BLUE.value:
                 self.go_blue_tower()
                 # Scan all we need
                 self.tower_blue.temperature = self.temperature.read_temperature_f()
                 self.return_from_blue_tower()
-            elif tower == ColorScanOptions.YELLOW:
+            elif tower == ColorScanOptions.YELLOW.value:
                 self.go_yellow_tower()
                 # Scan all we need
                 self.tower_yellow.temperature = self.temperature.read_temperature_f()

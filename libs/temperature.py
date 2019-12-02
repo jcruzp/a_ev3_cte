@@ -36,5 +36,5 @@ class TemperatureSensor():
         return temp
 
     def read_temperature_f(self):
-        temp = to_fahrenheit(read_temperature_c)
+        temp = self.to_fahrenheit(self.read_temperature_c())
         return temp

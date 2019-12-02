@@ -30,9 +30,9 @@ class ScanTower():
     def __init__(self):
 
         self.scan_tower = LargeMotor(OUTPUT_B)
-        self.gyro_sensor = GyroSensor()
-        self.gyro_sensor.reset
-        self.ultrasonic_sensor = UltrasonicSensor()
+        #self.gyro_sensor = GyroSensor()
+        #self.gyro_sensor.reset
+        #self.ultrasonic_sensor = UltrasonicSensor()
         self.leds = Leds()
         self.sound = Sound()
         self.tower_position = TowerPosition.CENTER
@@ -59,7 +59,7 @@ class ScanTower():
     def print_values(self):
         while True:
             if self.tower_position != TowerPosition.CENTER:
-                print("Angle: %4.0i %s: %10.2f" % (self.gyro_sensor.angle,self.tower_position,self.ultrasonic_sensor.distance_centimeters_continuous))
+                #print("Angle: %4.0i %s: %10.2f" % (self.gyro_sensor.angle,self.tower_position,self.ultrasonic_sensor.distance_centimeters_continuous))
                 sleep(0.1)
 
     def scan_field(self):

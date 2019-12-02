@@ -12,6 +12,7 @@ from ev3dev2.port import LegoPort
 
 from smbus import SMBus
 from time import sleep
+from enum import Enum
 
 class SignatureColor(Enum):
     NONE = 0
@@ -45,22 +46,33 @@ class Pixy2Cam():
         self.lego_bus.write_i2c_block_data(self.address, 0, data)
         sleep(0.1)
       
-    def find_object(self, signature=SignatureColor.RED):
-        # Data for requesting block
-        data = [174, 193, 32, 2, signature, 1]
-        # Request block
-        self.lego_bus.write_i2c_block_data(self.address, 0, data)
-        sleep(0.1)
-        # Read block
-        block = self.lego_bus.read_i2c_block_data(self.address, 0, 20)
-        sleep(0.1)
+    def find_object(self, signature):
+        if signature == 3: 
+            signature_search = 6
+        else:
+            signature_search = signature
             
-        data_cam={}
-        data_cam['sig'] = block[7]*256 + block[6]
-        data_cam['x'] = block[9]*256 +  block[8]
-        data_cam['y'] = block[11]*256 +  block[10]
-        data_cam['w'] = block[13]*256 +  block[12]
-        data_cam['h'] = block[15]*256 +  block[14]
+         # Data for requesting block
+        data = [174, 193, 32, 2, signature_search, 1]
+            
+        sig_data_return=0
+        while sig_data_return != signature: 
+                       
+            # Request block
+            self.lego_bus.write_i2c_block_data(self.address, 0, data)
+            sleep(0.1)
+            # Read block
+            block = self.lego_bus.read_i2c_block_data(self.address, 0, 20)
+            sleep(0.1)
+                
+            data_cam={}
+            data_cam['sig'] = block[7]*256 + block[6]
+            data_cam['x'] = block[9]*256 +  block[8]
+            data_cam['y'] = block[11]*256 +  block[10]
+            data_cam['w'] = block[13]*256 +  block[12]
+            data_cam['h'] = block[15]*256 +  block[14]
+            sig_data_return=data_cam['sig']
+            
         return data_cam
 
     def object_distance(self, object_width=1):

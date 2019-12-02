@@ -7,7 +7,7 @@
 
 import logging
 from ev3dev2.display import Display
-from ev3dev2.sensor import INPUT_1
+from ev3dev2.sensor import INPUT_3
 from ev3dev2.sensor.lego import TouchSensor
 
 from time import sleep
@@ -20,7 +20,7 @@ logging.info('Initializing all objects...')
 lcd = Display()
 
 # Connect ToucSensor
-ts = TouchSensor(INPUT_1)
+ts = TouchSensor(INPUT_3)
 
 pixy2=Pixy2Cam()
 
@@ -36,7 +36,7 @@ while not ts.value():
     # Clear display
     lcd.clear()
     
-    data_cam=pixy2.find_object(SignatureColor.RED)
+    data_cam=pixy2.find_object(1)
       
     sig =data_cam['sig']
     x = data_cam['x']
@@ -44,10 +44,12 @@ while not ts.value():
     w = data_cam['w']
     h = data_cam['h']
     
+    logging.info("Sig:" + str(sig))
     logging.info("X:" + str(x))
     logging.info("Y:" + str(y))
     logging.info("W:" + str(w))
     logging.info("H:" + str(h))
+    logging.info("     ")
     # Scale to resolution of EV3 display:
     # Resolution Pixy2 while color tracking; (316x208)
     # Resolution EV3 display: (178x128)
