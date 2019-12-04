@@ -1,0 +1,8 @@
+Control payload: {'type': 'exploring_towers', 'towerColorA': 'blue'}
+Control payload: {'type': 'exploring_towers', 'towerColorA': 'red'}
+Control payload: {'condition': 'GPS position', 'type': 'read_conditions'}
+Control payload: {'condition': 'ambient temperature', 'type': 'read_conditions'}
+Control payload: {'condition': 'relative humidity', 'type': 'read_conditions'}
+Control payload: {'type': 'return_base'}
+Control payload: {'type': 'verify_color'}
+

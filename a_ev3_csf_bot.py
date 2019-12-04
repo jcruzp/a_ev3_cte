@@ -28,10 +28,10 @@ from enum import Enum
 
 from agt import AlexaGadget
 
-from color_arm import ColorArm
-from steering_wheel import SteeringWheel
-from car_engine import CarEngine
-from scan_tower import ScanTower
+from libs.color_arm import ColorArm
+from libs.steering_wheel import SteeringWheel
+from libs.car_engine import CarEngine
+from libs.scan_tower import ScanTower
 
 # Set the logging level to INFO to see messages from AlexaGadget
 logging.basicConfig(level=logging.INFO)
@@ -125,6 +125,8 @@ class MindstormsGadget(AlexaGadget):
         try:
             payload = json.loads(directive.payload.decode("utf-8"))
             print("Control payload: {}".format(payload))
+            
+            """
             control_type = payload["type"]
             if control_type == "move":
 
@@ -135,7 +137,7 @@ class MindstormsGadget(AlexaGadget):
             if control_type == "command":
                 # Expected params: [command]
                 self._activate(payload["command"])
-
+            """
         except KeyError:
             print("Missing expected parameters: {}".format(directive))
 
