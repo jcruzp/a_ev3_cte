@@ -34,18 +34,18 @@ const LaunchRequestHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
     },
-    handle: async function(handlerInput) {
+    handle: async function (handlerInput) {
 
         const request = handlerInput.requestEnvelope;
         const { apiEndpoint, apiAccessToken } = request.context.System;
         const apiResponse = await Util.getConnectedEndpoints(apiEndpoint, apiAccessToken);
         if ((apiResponse.endpoints || []).length === 0) {
             return handlerInput.responseBuilder
-            .speak(`I couldn't find an EV3 Brick connected to this Echo device. Please check to make sure your EV3 Brick is connected, and try again.`)
-            .getResponse();
+                .speak(`I couldn't find an EV3 Brick connected to this Echo device. Please check to make sure your EV3 Brick is connected, and try again.`)
+                .getResponse();
         }
-        
-        
+
+
         // Set bot start position at base
         Util.putSessionAttribute(handlerInput, 'botPosition', BOTATBASE);
 
@@ -63,7 +63,7 @@ const LaunchRequestHandler = {
         let speechOutput = "Autonomous EV3 Color Station Finder Bot is reading for explore stations at field";
         return handlerInput.responseBuilder
             .speak(speechOutput + BG_MUSIC)
-            .addDirective(Util.buildStartEventHandler(token,60000, {}))
+            .addDirective(Util.buildStartEventHandler(token, 60000, {}))
             .getResponse();
     }
 };
@@ -76,23 +76,23 @@ const ExploreIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'ExploreIntent';
     },
     handle: function (handlerInput) {
-        
+
         let towerColorA = Alexa.getSlotValue(handlerInput.requestEnvelope, 'TowerColorA');
         let towerColorB = Alexa.getSlotValue(handlerInput.requestEnvelope, 'TowerColorB');
-        
-         if (towerColorA === towerColorB) {
+
+        if (towerColorA === towerColorB) {
             return handlerInput.responseBuilder
-            .speak(`The first and second tower must have different colors`)
-            .withShouldEndSession(false)
-            .getResponse();
+                .speak(`The first and second tower must have different colors`)
+                .withShouldEndSession(false)
+                .getResponse();
         }
-        
-     
+
+
         const attributesManager = handlerInput.attributesManager;
         let endpointId = attributesManager.getSessionAttributes().endpointId || [];
-      
-        let speechOutput=''
-        let directive=''
+
+        let speechOutput = ''
+        let directive = ''
         if (towerColorB === undefined) {
             // Construct the directive with the payload containing the move parameters
             directive = Util.build(endpointId, NAMESPACE, NAME_CONTROL,
@@ -100,13 +100,13 @@ const ExploreIntentHandler = {
                     type: 'exploring_towers',
                     towerColorA: towerColorA
                 });
-    
+
             // Only use for test propouse
             Util.putSessionAttribute(handlerInput, 'botPosition', (towerColorA === 'red' ? BOTREDTOWER : BOTBLUETOWER));
-             
+
             speechOutput = `Going to explore tower ${towerColorA}`;
         } else {
-             // Construct the directive with the payload containing the move parameters
+            // Construct the directive with the payload containing the move parameters
             directive = Util.build(endpointId, NAMESPACE, NAME_CONTROL,
                 {
                     type: 'exploring_towers',
@@ -114,8 +114,8 @@ const ExploreIntentHandler = {
                     towerColorB: towerColorB
                 });
             speechOutput = `Going to explore tower ${towerColorA} and ${towerColorB}`;
-        }    
-       
+        }
+
         return handlerInput.responseBuilder
             .speak(speechOutput + BG_MUSIC)
             .addDirective(directive)
@@ -132,22 +132,23 @@ const ConditionsIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'ConditionsIntent';
     },
     handle: function (handlerInput) {
-        
+
         let condition = Alexa.getSlotValue(handlerInput.requestEnvelope, 'ReadConditions');
-        
+
         const attributesManager = handlerInput.attributesManager;
         let endpointId = attributesManager.getSessionAttributes().endpointId || [];
-      
-            // Construct the directive with the payload containing the move parameters
+        const botposition = attributesManager.getSessionAttributes().botPosition || BOTATBASE;
+
+        // Construct the directive with the payload containing the move parameters
         let directive = Util.build(endpointId, NAMESPACE, NAME_CONTROL,
             {
                 type: 'read_conditions',
+                botposition: botposition,
                 condition: condition
             });
-            
-        const botposition = attributesManager.getSessionAttributes().botPosition || BOTATBASE;
+
         let speechOutput = `Reading ${condition} at ${botposition}`;
-        
+
         return handlerInput.responseBuilder
             .speak(speechOutput + BG_MUSIC)
             .addDirective(directive)
@@ -163,32 +164,32 @@ const ReturnBaseIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'ReturnBaseIntent';
     },
     handle: function (handlerInput) {
-        
+
         const attributesManager = handlerInput.attributesManager;
         const botposition = attributesManager.getSessionAttributes().botPosition || BOTATBASE;
-        
+
         if (botposition === BOTATBASE) {
             return handlerInput.responseBuilder
-            .speak(`The bot is already at base position`)
-            .withShouldEndSession(false)
-            .getResponse();
+                .speak(`The bot is already at base position`)
+                .withShouldEndSession(false)
+                .getResponse();
         }
-        
-        
+
+
         let endpointId = attributesManager.getSessionAttributes().endpointId || [];
-      
-            // Construct the directive with the payload containing the move parameters
+
+        // Construct the directive with the payload containing the move parameters
         let directive = Util.build(endpointId, NAMESPACE, NAME_CONTROL,
             {
                 type: 'return_base'
             });
 
-        
+
         let speechOutput = `Returning base from ${botposition}`;
-        
-         // Only use for test propouse
-        Util.putSessionAttribute(handlerInput, 'botPosition',BOTATBASE);
-        
+
+        // Only use for test propouse
+        Util.putSessionAttribute(handlerInput, 'botPosition', BOTATBASE);
+
         return handlerInput.responseBuilder
             .speak(speechOutput + BG_MUSIC)
             .addDirective(directive)
@@ -204,28 +205,29 @@ const VerifyColorIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'VerifyColorIntent';
     },
     handle: function (handlerInput) {
-        
+
         const attributesManager = handlerInput.attributesManager;
         const botposition = attributesManager.getSessionAttributes().botPosition || BOTATBASE;
-        
+
         if (botposition === BOTATBASE) {
             return handlerInput.responseBuilder
-            .speak(`The bot is at base position cannot check color`)
-            .withShouldEndSession(false)
-            .getResponse();
+                .speak(`The bot is at base position cannot check color`)
+                .withShouldEndSession(false)
+                .getResponse();
         }
-        
-        
+
+
         let endpointId = attributesManager.getSessionAttributes().endpointId || [];
-      
-            // Construct the directive with the payload containing the move parameters
+
+        // Construct the directive with the payload containing the move parameters
         let directive = Util.build(endpointId, NAMESPACE, NAME_CONTROL,
             {
-                type: 'verify_color'
+                type: 'verify_color',
+                botposition: botposition
             });
 
         let speechOutput = `Verifying that bot is at ${botposition}`;
-        
+
         return handlerInput.responseBuilder
             .speak(speechOutput + BG_MUSIC)
             .addDirective(directive)
@@ -370,24 +372,38 @@ const EventsReceivedRequestHandler = {
         let name = customEvent.header.name;
 
         let speechOutput;
-        if (name === 'Proximity') {
-            let distance = parseInt(payload.distance);
-            if (distance < 10) {
-                let speechOutput = "Intruder detected! What would you like to do?";
-                return handlerInput.responseBuilder
-                    .speak(speechOutput, "REPLACE_ALL")
-                    .withShouldEndSession(false)
-                    .getResponse();
-            }
-        } else if (name === 'Sentry') {
-            if ('fire' in payload) {
-                speechOutput = "Threat eliminated";
-            }
 
-        } else if (name === 'Speech') {
+        if (name === 'at_tower') {
             speechOutput = payload.speechOut;
+        } else if (name === 'at_base') {
+            speechOutput = payload.speechOut;
+        } else if (name === 'temperature') {
+            speechOutput = payload.speechOut;
+        } else if (name === 'humidity') {
+            speechOutput = payload.speechOut;
+        } else if (name === 'color') {
+            speechOutput = payload.speechOut;
+        } else if (name === 'gps') {
+            speechOutput = payload.speechOut;
+        }
+        // if (name === 'Proximity') {
+        //     let distance = parseInt(payload.distance);
+        //     if (distance < 10) {
+        //         let speechOutput = "Intruder detected! What would you like to do?";
+        //         return handlerInput.responseBuilder
+        //             .speak(speechOutput, "REPLACE_ALL")
+        //             .withShouldEndSession(false)
+        //             .getResponse();
+        //     }
+        // } else if (name === 'Sentry') {
+        //     if ('fire' in payload) {
+        //         speechOutput = "Threat eliminated";
+        //     }
 
-        } else {
+        // } else if (name === 'Speech') {
+        //     speechOutput = payload.speechOut;
+
+        else {
             speechOutput = "Event not recognized. Awaiting new command.";
         }
         return handlerInput.responseBuilder

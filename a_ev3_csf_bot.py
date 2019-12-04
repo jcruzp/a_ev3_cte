@@ -37,40 +37,49 @@ from libs.scan_tower import ScanTower
 logging.basicConfig(level=logging.INFO)
 
 
-class Direction(Enum):
-    """
-    The list of directional commands and their variations.
-    These variations correspond to the skill slot values.
-    """
-    FORWARD = ['forward', 'forwards', 'go forward']
-    BACKWARD = ['backward', 'backwards', 'go backward']
-    LEFT = ['left', 'go left']
-    RIGHT = ['right', 'go right']
-    STOP = ['stop', 'brake', 'halt']
+# class Direction(Enum):
+#     """
+#     The list of directional commands and their variations.
+#     These variations correspond to the skill slot values.
+#     """
+#     FORWARD = ['forward', 'forwards', 'go forward']
+#     BACKWARD = ['backward', 'backwards', 'go backward']
+#     LEFT = ['left', 'go left']
+#     RIGHT = ['right', 'go right']
+#     STOP = ['stop', 'brake', 'halt']
 
 
-class Command(Enum):
-    """
-    The list of preset commands and their invocation variation.
-    These variations correspond to the skill slot values.
-    """
-    MOVE_CIRCLE = ['circle', 'move around']
-    MOVE_SQUARE = ['square']
-    SENTRY = ['guard', 'guard mode', 'sentry', 'sentry mode']
-    PATROL = ['patrol', 'patrol mode']
-    FIRE_ONE = ['cannon', '1 shot', 'one shot']
-    FIRE_ALL = ['all shots', 'all shot']
+# class Command(Enum):
+#     """
+#     The list of preset commands and their invocation variation.
+#     These variations correspond to the skill slot values.
+#     """
+#     MOVE_CIRCLE = ['circle', 'move around']
+#     MOVE_SQUARE = ['square']
+#     SENTRY = ['guard', 'guard mode', 'sentry', 'sentry mode']
+#     PATROL = ['patrol', 'patrol mode']
+#     FIRE_ONE = ['cannon', '1 shot', 'one shot']
+#     FIRE_ALL = ['all shots', 'all shot']
 
+
+# class EventName(Enum):
+#     """
+#     The list of custom event name sent from this gadget
+#     """
+#     SENTRY = "Sentry"
+#     PROXIMITY = "Proximity"
+#     SPEECH = "Speech"
 
 class EventName(Enum):
     """
     The list of custom event name sent from this gadget
     """
-    SENTRY = "Sentry"
-    PROXIMITY = "Proximity"
-    SPEECH = "Speech"
-
-
+    ARRIVE_TOWER = "at_tower"
+    ARRIVE_BASE = "at_base" 
+    TEMPERATURE = "temperature"
+    HUMIDITY ="humidity"
+    COLOR = "color"
+    GPS = "gps"
 
 class MindstormsGadget(AlexaGadget):
     """
@@ -125,10 +134,22 @@ class MindstormsGadget(AlexaGadget):
         try:
             payload = json.loads(directive.payload.decode("utf-8"))
             print("Control payload: {}".format(payload))
-            
-            """
             control_type = payload["type"]
-            if control_type == "move":
+        
+            if control_type == "read_conditions" :
+               self._read_conditions(payload["botposition"], payload["condition"]) 
+            
+            if control_type == "return_base" :
+                self._return_base() 
+                
+            if control_type == "verify_color" :
+                self._verify_color(payload["botposition"]) 
+                
+            if control_type == "exploring_towers" :
+                self._exploring_towers(payload["towerColorA"],payload["towerColorB"])  
+                
+            """
+            if control_type == "move"
 
                 # Expected params: [direction, duration, speed]
                 self._move(payload["direction"], int(
@@ -140,97 +161,126 @@ class MindstormsGadget(AlexaGadget):
             """
         except KeyError:
             print("Missing expected parameters: {}".format(directive))
+            
+    def _read_conditions(self, botposition, condition):
+        if (condition == "ambient temperature"):
+            self._send_event(EventName.TEMPERATURE, {
+                              'speechOut': "Temperature at " + botposition + " is 10 degrees F"})
+        
+        if (condition == "relative humidity"):
+                self._send_event(EventName.HUMIDITY, {
+                              'speechOut': "Relative humidity at " + botposition + " is 20%"})  
+                
+        if (condition == "GPS position"):
+                self._send_event(EventName.GPS, {
+                              'speechOut': "GPS coords at " + botposition + " are Latitud 10 degrees and Longitud 30 degrees"})   
+                
+    def _return_base(self):
+        self._send_event(EventName.ARRIVE_BASE, {
+                              'speechOut': "Arrive at base"})
+        
+    def _verify_color(self, botposition):
+        self._send_event(EventName.HUMIDITY, {
+                              'speechOut': "Color verified at " + botposition})  
+        
+    def _exploring_towers(self, towerColorA, towerColorB):
+        print(towerColorA.capitalize())
+        print(towerColorB.capitalize())
+        self._send_event(EventName.ARRIVE_TOWER, {
+                              'speechOut': "Arrive xxx tower" })
+        
+                
 
-    def _move(self, direction, duration: int, speed: int, is_blocking=False):
-        """
-        Handles move commands from the directive.
-        Right and left movement can under or over turn depending on the surface type.
-        :param direction: the move direction
-        :param duration: the duration in seconds
-        :param speed: the speed percentage as an integer
-        :param is_blocking: if set, motor run until duration expired before accepting another command
-        """
-        print("Move command: ({}, {}, {}, {})".format(
-            direction, speed, duration, is_blocking))
-        if direction in Direction.FORWARD.value:
-            self.drive.on_for_seconds(SpeedPercent(speed), SpeedPercent(
-                speed), duration, block=is_blocking)
+    # def _move(self, direction, duration: int, speed: int, is_blocking=False):
+    #     """
+    #     Handles move commands from the directive.
+    #     Right and left movement can under or over turn depending on the surface type.
+    #     :param direction: the move direction
+    #     :param duration: the duration in seconds
+    #     :param speed: the speed percentage as an integer
+    #     :param is_blocking: if set, motor run until duration expired before accepting another command
+    #     """
+    #     print("Move command: ({}, {}, {}, {})".format(
+    #         direction, speed, duration, is_blocking))
+    #     if direction in Direction.FORWARD.value:
+    #         self.drive.on_for_seconds(SpeedPercent(speed), SpeedPercent(
+    #             speed), duration, block=is_blocking)
 
-        if direction in Direction.BACKWARD.value:
-            self.drive.on_for_seconds(
-                SpeedPercent(-speed), SpeedPercent(-speed), duration, block=is_blocking)
+    #     if direction in Direction.BACKWARD.value:
+    #         self.drive.on_for_seconds(
+    #             SpeedPercent(-speed), SpeedPercent(-speed), duration, block=is_blocking)
 
-        if direction in (Direction.RIGHT.value + Direction.LEFT.value):
-            self._turn(direction, speed)
-            self.drive.on_for_seconds(SpeedPercent(speed), SpeedPercent(
-                speed), duration, block=is_blocking)
+    #     if direction in (Direction.RIGHT.value + Direction.LEFT.value):
+    #         self._turn(direction, speed)
+    #         self.drive.on_for_seconds(SpeedPercent(speed), SpeedPercent(
+    #             speed), duration, block=is_blocking)
 
-        if direction in Direction.STOP.value:
-            self.drive.off()
-            self.patrol_mode = False
+    #     if direction in Direction.STOP.value:
+    #         self.drive.off()
+    #         self.patrol_mode = False
 
-    def _activate(self, command, speed=50):
-        """
-        Handles preset commands.
-        :param command: the preset command
-        :param speed: the speed if applicable
-        """
-        print("Activate command: ({}, {})".format(command, speed))
-        if command in Command.MOVE_CIRCLE.value:
-            self.drive.on_for_seconds(SpeedPercent(
-                int(speed)), SpeedPercent(5), 12)
+    # def _activate(self, command, speed=50):
+    #     """
+    #     Handles preset commands.
+    #     :param command: the preset command
+    #     :param speed: the speed if applicable
+    #     """
+    #     print("Activate command: ({}, {})".format(command, speed))
+    #     if command in Command.MOVE_CIRCLE.value:
+    #         self.drive.on_for_seconds(SpeedPercent(
+    #             int(speed)), SpeedPercent(5), 12)
 
-        if command in Command.MOVE_SQUARE.value:
-            for i in range(4):
-                self._move("right", 2, speed, is_blocking=True)
+    #     if command in Command.MOVE_SQUARE.value:
+    #         for i in range(4):
+    #             self._move("right", 2, speed, is_blocking=True)
 
-        if command in Command.PATROL.value:
-            # Set patrol mode to resume patrol thread processing
-            self.patrol_mode = True
+    #     if command in Command.PATROL.value:
+    #         # Set patrol mode to resume patrol thread processing
+    #         self.patrol_mode = True
 
-        if command in Command.SENTRY.value:
-            self.sentry_mode = True
-            self._send_event(EventName.SPEECH, {
-                             'speechOut': "Sentry mode activated"})
+    #     if command in Command.SENTRY.value:
+    #         self.sentry_mode = True
+    #         self._send_event(EventName.SPEECH, {
+    #                          'speechOut': "Sentry mode activated"})
 
-            # Perform Shuffle posture
-            self.drive.on_for_seconds(SpeedPercent(80), SpeedPercent(-80), 0.2)
-            time.sleep(0.3)
-            self.drive.on_for_seconds(SpeedPercent(-40), SpeedPercent(40), 0.2)
+    #         # Perform Shuffle posture
+    #         self.drive.on_for_seconds(SpeedPercent(80), SpeedPercent(-80), 0.2)
+    #         time.sleep(0.3)
+    #         self.drive.on_for_seconds(SpeedPercent(-40), SpeedPercent(40), 0.2)
 
-            self.leds.set_color("LEFT", "YELLOW", 1)
-            self.leds.set_color("RIGHT", "YELLOW", 1)
+    #         self.leds.set_color("LEFT", "YELLOW", 1)
+    #         self.leds.set_color("RIGHT", "YELLOW", 1)
 
-        if command in Command.FIRE_ONE.value:
-            print("Fire one")
-            self.weapon.on_for_rotations(SpeedPercent(100), 3)
-            self._send_event(EventName.SENTRY, {'fire': 1})
-            self.sentry_mode = False
-            print("Sent sentry event - 1 shot, alarm reset")
-            self.leds.set_color("LEFT", "GREEN", 1)
-            self.leds.set_color("RIGHT", "GREEN", 1)
+    #     if command in Command.FIRE_ONE.value:
+    #         print("Fire one")
+    #         self.weapon.on_for_rotations(SpeedPercent(100), 3)
+    #         self._send_event(EventName.SENTRY, {'fire': 1})
+    #         self.sentry_mode = False
+    #         print("Sent sentry event - 1 shot, alarm reset")
+    #         self.leds.set_color("LEFT", "GREEN", 1)
+    #         self.leds.set_color("RIGHT", "GREEN", 1)
 
-        if command in Command.FIRE_ALL.value:
-            print("Fire all")
-            self.weapon.on_for_rotations(SpeedPercent(100), 10)
-            self._send_event(EventName.SENTRY, {'fire': 3})
-            self.sentry_mode = False
-            print("sent sentry event - 3 shots, alarm reset")
-            self.leds.set_color("LEFT", "GREEN", 1)
-            self.leds.set_color("RIGHT", "GREEN", 1)
+    #     if command in Command.FIRE_ALL.value:
+    #         print("Fire all")
+    #         self.weapon.on_for_rotations(SpeedPercent(100), 10)
+    #         self._send_event(EventName.SENTRY, {'fire': 3})
+    #         self.sentry_mode = False
+    #         print("sent sentry event - 3 shots, alarm reset")
+    #         self.leds.set_color("LEFT", "GREEN", 1)
+    #         self.leds.set_color("RIGHT", "GREEN", 1)
 
-    def _turn(self, direction, speed):
-        """
-        Turns based on the specified direction and speed.
-        Calibrated for hard smooth surface.
-        :param direction: the turn direction
-        :param speed: the turn speed
-        """
-        if direction in Direction.LEFT.value:
-            self.drive.on_for_seconds(SpeedPercent(0), SpeedPercent(speed), 2)
+    # def _turn(self, direction, speed):
+    #     """
+    #     Turns based on the specified direction and speed.
+    #     Calibrated for hard smooth surface.
+    #     :param direction: the turn direction
+    #     :param speed: the turn speed
+    #     """
+    #     if direction in Direction.LEFT.value:
+    #         self.drive.on_for_seconds(SpeedPercent(0), SpeedPercent(speed), 2)
 
-        if direction in Direction.RIGHT.value:
-            self.drive.on_for_seconds(SpeedPercent(speed), SpeedPercent(0), 2)
+    #     if direction in Direction.RIGHT.value:
+    #         self.drive.on_for_seconds(SpeedPercent(speed), SpeedPercent(0), 2)
 
     def _send_event(self, name: EventName, payload):
         """
