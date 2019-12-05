@@ -80,6 +80,7 @@ class EventName(Enum):
     HUMIDITY ="humidity"
     COLOR = "color"
     GPS = "gps"
+    ALLCONDITIONS = "all_conditions"
 
 class MindstormsGadget(AlexaGadget):
     """
@@ -161,33 +162,50 @@ class MindstormsGadget(AlexaGadget):
             """
         except KeyError:
             print("Missing expected parameters: {}".format(directive))
-            
+
+    def _read_ambiente_temperature(self):
+        self._send_event(EventName.TEMPERATURE, {
+                              'speechOut': "Temperature at " + botposition + " is 10 degrees F"}) 
+
+    def _read_relative_humidity(self):
+        self._send_event(EventName.HUMIDITY, {
+                              'speechOut': "Relative humidity at " + botposition + " is 20%"}) 
+
+    def _read_gps_position(self):
+        self._send_event(EventName.GPS, {
+                              'speechOut': "GPS coordinates at " + botposition + " are latitude 10 degrees and longitude 30 degrees"})   
+    
     def _read_conditions(self, botposition, condition):
         if (condition == "ambient temperature"):
-            self._send_event(EventName.TEMPERATURE, {
-                              'speechOut': "Temperature at " + botposition + " is 10 degrees F"})
+            self._read_ambiente_temperature()
         
         if (condition == "relative humidity"):
-                self._send_event(EventName.HUMIDITY, {
-                              'speechOut': "Relative humidity at " + botposition + " is 20%"})  
+            self._read_relative_humidity()    
                 
         if (condition == "GPS position"):
-                self._send_event(EventName.GPS, {
-                              'speechOut': "GPS coords at " + botposition + " are Latitud 10 degrees and Longitud 30 degrees"})   
-                
+            self._read_gps_position() 
+
+        if (condition == "all conditions"):
+            self._send_event(EventName.ALLCONDITIONS, {
+                              'speechOut': "Reading all tower conditions "})
+            self._read_ambiente_temperature()
+            self._read_relative_humidity()
+            self._read_gps_position()  
+
+                    
     def _return_base(self):
         self._send_event(EventName.ARRIVE_BASE, {
-                              'speechOut': "Arrive at base"})
+                              'speechOut': "Robot arrive at base"})
         
     def _verify_color(self, botposition):
         self._send_event(EventName.HUMIDITY, {
-                              'speechOut': "Color verified at " + botposition})  
+                              'speechOut': "Color verified for " + botposition})  
         
     def _exploring_towers(self, towerColorA, towerColorB):
         print(towerColorA.capitalize())
         print(towerColorB.capitalize())
         self._send_event(EventName.ARRIVE_TOWER, {
-                              'speechOut': "Arrive xxx tower" })
+                              'speechOut': "Robot arrive xxx tower." })
         
                 
 
