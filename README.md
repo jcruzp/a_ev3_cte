@@ -19,13 +19,13 @@ Input_4 = Pixy2   (Ultrasonic)
 
 Declaratives
 
-Control payload: {'type': 'exploring_towers', 'towerColorA': 'blue'}
-Control payload: {'type': 'exploring_towers', 'towerColorA': 'red'}
+Control payload: {'botposition': 'red tower', 'type': 'exploring_towers', 'towerColorA': 'blue'}
+Control payload: {'botposition': 'red tower', 'type': 'exploring_towers', 'towerColorA': 'red'}
 Control payload: {'botposition': 'red tower', 'condition': 'GPS position','type': 'read_conditions'}
 Control payload: {'botposition': 'red tower', 'condition': 'ambient temperature','type': 'read_conditions'}
 Control payload: {'botposition': 'red tower', 'condition': 'relative humidity','type': 'read_conditions'}
 Control payload: {'botposition': 'red tower', 'condition': 'all conditions','type': 'read_conditions'}
-Control payload: {'type': 'return_base'}
+Control payload: {'botposition': 'red tower', 'type': 'return_base'}
 Control payload: {'botposition': 'red tower', 'type': 'verify_color'}
 
 Session Values
@@ -35,11 +35,14 @@ botPosition = base, red tower, blue tower
 
 Events
 
+   GOING_TOWER = "going_tower"
+   RETURN_BASE = "return_base"
    ARRIVE_TOWER = "at_tower"
-    ARRIVE_BASE = "at_base" 
-    TEMPERATURE = "temperature"
-    HUMIDITY ="humidity"
-    COLOR = "color"
-    GPS = "gps"
-    ALLCONDITIONS = "all_conditions"
+   ARRIVE_TOWER_AUTO = "at_tower_auto"
+   ARRIVE_BASE = "at_base"
+   TEMPERATURE = "temperature"
+   HUMIDITY = "humidity"
+   COLOR = "color"
+   GPS = "gps"
+   ALLCONDITIONS = "all_conditions"
 

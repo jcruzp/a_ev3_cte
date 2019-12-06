@@ -20,29 +20,18 @@ from enum import Enum
 
 from agt import AlexaGadget
 
-from libs.color_arm import ColorArm, ColorScanOptions
+from libs.color_arm import ColorArm
 from libs.navegation_map import NavegationMap
 from libs.temperature import TemperatureSensor
-
 
 # Set the logging level to INFO to see messages from AlexaGadget
 logging.basicConfig(level=logging.INFO)
 
-# class Command(Enum):
-#     """
-#     The list of preset commands and their invocation variation.
-#     These variations correspond to the skill slot values.
-#     """
-#     MOVE_CIRCLE = ['circle', 'move around']
-#     MOVE_SQUARE = ['square']
-#     SENTRY = ['guard', 'guard mode', 'sentry', 'sentry mode']
-#     PATROL = ['patrol', 'patrol mode']
-#     FIRE_ONE = ['cannon', '1 shot', 'one shot']
-#     FIRE_ALL = ['all shots', 'all shot']
-
-
 
 class DirectiveName(Enum):
+    """
+    List of directives send by Alexa Skill
+    """
     READ_CONDITIONS = "read_conditions"
     RETURN_BASE = "return_base"
     VERIFY_COLOR = "verify_color"
@@ -56,6 +45,7 @@ class EventName(Enum):
     GOING_TOWER = "going_tower"
     RETURN_BASE = "return_base"
     ARRIVE_TOWER = "at_tower"
+    ARRIVE_TOWER_AUTO = "at_tower_auto"
     ARRIVE_BASE = "at_base"
     TEMPERATURE = "temperature"
     HUMIDITY = "humidity"
@@ -65,6 +55,9 @@ class EventName(Enum):
 
 
 class ConditionName(Enum):
+    """
+    List of all conditios to read at tower
+    """
     AMBIENTE_TEMPERATURE = "ambient temperature"
     RELATIVE_HUMIDITY = "relative humidity"
     GPS_POSITION = "GPS position"
@@ -72,6 +65,9 @@ class ConditionName(Enum):
 
 
 class RobotPosition(Enum):
+    """
+    List of robot positions 
+    """
     ROBOT_AT_BASE = "base"
     ROBOT_AT_RED_TOWER = "red tower"
     ROBOT_AT_BLUE_TOWER = "blue tower"
@@ -89,21 +85,12 @@ class MindstormsGadget(AlexaGadget):
         super().__init__()
 
         # Robot initial position
-        self.botposition = "at base"
+        self.botposition = RobotPosition.ROBOT_AT_BASE
 
-        # Robot state
-        #self.sentry_mode = False
-        #self.patrol_mode = False
-
-        # Connect two large motors on output ports B and C
-        #self.drive = MoveTank(OUTPUT_B, OUTPUT_C)
-        #self.weapon = MediumMotor(OUTPUT_A)
         self.sound = Sound()
         self.leds = Leds()
-        
+
         self.nav_map = NavegationMap()
-        #self.ir = InfraredSensor()
-        #self.us = UltrasonicSensor()
 
         # Start threads
         #threading.Thread(target=self._patrol_thread, daemon=True).start()
@@ -166,10 +153,16 @@ class MindstormsGadget(AlexaGadget):
             'speechOut': "Temperature at " + self.botposition + " is " + temperature.read_temperature_f() + " degrees fahrenheit"})
 
     def _read_relative_humidity(self):
+        """
+        Read humidity at tower using humidity sensor
+        """
         self._send_event(EventName.HUMIDITY, {
             'speechOut': "Relative humidity at " + self.botposition + " is 20%"})
 
     def _read_gps_position(self):
+        """
+        Read GPS latitude and longitude coordinates
+        """
         self._send_event(EventName.GPS, {
             'speechOut': "GPS coordinates at " + self.botposition + " are latitude 10 degrees and longitude 30 degrees"})
 
@@ -185,23 +178,23 @@ class MindstormsGadget(AlexaGadget):
 
         if (condition == ConditionName.GPS_POSITION):
             self._read_gps_position()
-
+        # Read all conditions and sent events to Alexa
         if (condition == ConditionName.ALL_CONDITIONS):
-            self._send_event(EventName.ALLCONDITIONS, {
-                'speechOut': "Reading all tower conditions "})
             self._read_ambiente_temperature()
             self._read_relative_humidity()
             self._read_gps_position()
 
     def _return_base(self):
-        self._send_event(EventName.RETURN_BASE, {
-            'speechOut': "Robot is going to base"})
+        """
+        Robot return to base from current tower
+        """
         if (self.botposition == RobotPosition.ROBOT_AT_RED_TOWER):
             self.nav_map.return_from_red_tower()
         if (self.botposition == RobotPosition.ROBOT_AT_BLUE_TOWER):
             self.nav_map.return_from_blue_tower()
         self._send_event(EventName.ARRIVE_BASE, {
-            'speechOut': "Robot arrive at base"})
+            'speechOut': "Robot arrive at base",
+            'botPosition': RobotPosition.ROBOT_AT_BASE})
 
     def _verify_color(self):
         """
@@ -213,45 +206,47 @@ class MindstormsGadget(AlexaGadget):
             'speechOut': "The scanned color at " + self.botposition + " is " + tower_color})
 
     def _exploring_towers(self, towerColorA, towerColorB):
-        print(towerColorA.capitalize())
-        print(towerColorB.capitalize())
-        # if not exist towerB color is manual explorer action
-        nav_map = NavegationMap()
+        """
+        If directive have one color tower to go is a manual explorer workflow.
+        If it have two color towers to go is a autonomous explorer towers
+        """
+        # if not exist towerB color is manual explorer action based in user directives
         if (towerColorB == ""):
-            nav_map.set_order_list(
+            self.nav_map.set_order_list(
                 tower_order_list=[towerColorA.capitalize()])
-            logging.info('Begin exploring towers ...')
+            logging.info('Begin manual exploring towers ...')
             # Scan all initial towers position
-            self.scan_finding_towers()
+            self.nav_map.scan_finding_towers()
             logging.info('Going ' + towerColorA + ' tower')
-            self._send_event(EventName.GOING_TOWER, {
-                'speechOut': "Robot going to " + towerColorA + " tower."})
-            if (towerColorA == ColorScanOptions.RED.value):
-                self.go_red_tower()
-            if (towerColorA == ColorScanOptions.BLUE.value):
-                self.go_blue_tower()
+            self.nav_map.go_color_tower(towerColorA)
             self._send_event(EventName.ARRIVE_TOWER, {
-                'speechOut': "Robot arrive " + towerColorA + " tower."})
+                'speechOut': "Robot arrive at " + towerColorA + " tower",
+                'botPosition': + towerColorA + " tower"})
+        # Autonomous explorer workflow
         else:
-            nav_map.set_order_list(
+            logging.info('Begin autonomous exploring towers ...')
+            self.nav_map.set_order_list(
                 tower_order_list=[towerColorA.capitalize(), towerColorB.capitalize()])
-            logging.info('Begin exploring towers ...')
             # Scan all initial towers position
-            self.scan_finding_towers()
-            for tower_color in self.tower_order_list:
+            self.nav_map.scan_finding_towers()
+            for tower_color in self.nav_map.tower_order_list:
                 # Robot go each tower
                 logging.info('Going ' + tower_color + ' tower')
                 self._send_event(EventName.GOING_TOWER, {
-                    'speechOut': "Robot going to " + tower_color + " tower."})
-                if (tower_color == ColorScanOptions.RED.value):
-                    self.go_red_tower()
-                if (tower_color == ColorScanOptions.BLUE.value):
-                    self.go_blue_tower()
-                self._send_event(EventName.ARRIVE_TOWER, {
-                    'speechOut': "Robot arrive " + towerColorA + " tower."})
+                    'speechOut': "Robot is going to the " + tower_color + " tower"})
+                self.nav_map.go_color_tower(tower_color)
+                self._send_event(EventName.ARRIVE_TOWER_AUTO, {
+                    'speechOut': "Robot arrive " + tower_color + " tower",
+                    'botPosition': + tower_color + " tower"})
+                time.sleep(1)
                 # At arrive tower read all conditions
-                self._read_conditions("all conditions")
+                self._send_event(EventName.ALLCONDITIONS, {
+                    'speechOut': "Reading all conditions at " + tower_color + " tower"})
+                self._read_conditions(ConditionName.ALL_CONDITIONS)
+                time.sleep(1)
                 # And return base
+                self._send_event(EventName.RETURN_BASE, {
+                    'speechOut': "Robot is returning to the base"})
                 self._return_base()
 
     # def _move(self, direction, duration: int, speed: int, is_blocking=False):

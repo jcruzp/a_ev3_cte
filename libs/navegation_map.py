@@ -10,6 +10,8 @@ import logging
 from libs.pixy2_cam import Pixy2Cam, SignatureColor
 from libs.car_engine import CarEngine
 from libs.scan_tower import ScanTower
+from libs.color_arm import ColorScanOptions
+
 
 # pixel position x < MIN_LEFT tower at left
 # pixel position x > MAX_RIGTH tower at right
@@ -257,6 +259,12 @@ class NavegationMap():
         self.go_right(backward=True)
         self.bot.turn_center()
         logging.info('Arriving to base...')
+
+    def go_color_tower(self, tower_color):
+        if (tower_color == ColorScanOptions.RED.value):
+            self.go_red_tower()
+        if (tower_color == ColorScanOptions.BLUE.value):
+            self.go_blue_tower()
 
     # def exploring_towers(self):
     #     """
