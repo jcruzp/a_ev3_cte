@@ -10,8 +10,6 @@ import logging
 from libs.pixy2_cam import Pixy2Cam, SignatureColor
 from libs.car_engine import CarEngine
 from libs.scan_tower import ScanTower
-from libs.color_arm import ColorArm, ColorScanOptions
-from libs.temperature import TemperatureSensor
 
 # pixel position x < MIN_LEFT tower at left
 # pixel position x > MAX_RIGTH tower at right
@@ -35,7 +33,7 @@ class TowerData():
         self.color = color
         data_cam = pixy2.find_object(color)
         self.coord_x = data_cam['x']
-        self.temperature = 0
+        #self.temperature = 0
 
     def new_position(self):
         """
@@ -57,16 +55,17 @@ class NavegationMap():
     Navegation map for Bot
     """
 
-    def __init__(self, tower_order_list=[ColorScanOptions.RED.value, ColorScanOptions.BLUE.value, ColorScanOptions.YELLOW.value]):
+    def __init__(self, tower_order_list=['']):
         logging.info('Initializing navegation map ...')
         self.bot = CarEngine()
         self.scan_tower = ScanTower()
-        self.color_arm = ColorArm()
         self.steps_left = 0
         self.steps_right = 0
         self.steps_forward = 0
         self.tower_order_list = tower_order_list
-        self.temperature = TemperatureSensor()
+        
+    def set_order_list(self, tower_order_list):
+        self.tower_order_list = tower_order_list
 
     def scan_finding_towers(self):
         """
@@ -259,31 +258,31 @@ class NavegationMap():
         self.bot.turn_center()
         logging.info('Arriving to base...')
 
-    def exploring_towers(self):
-        """
-        Go to each tower and exploring using all sensors
-        """
-        logging.info('Begin exploring towers ...')
-        # Scan all initial towers position
-        self.scan_finding_towers()
-        # Go and scan each tower in established order
-        for tower in self.tower_order_list:
-            logging.info('Go tower...' + tower)
-            if tower == ColorScanOptions.RED.value:
-                self.go_red_tower()
-                # Scan all we need using sensors
-                # Scan and verify tower color
-               # logging.info('Verifying tower color ...' + self.color_arm.scan_color())
-                # print(color_arm.scan_color())
-                self.tower_red.temperature = self.temperature.read_temperature_f()
-                self.return_from_red_tower()
-            elif tower == ColorScanOptions.BLUE.value:
-                self.go_blue_tower()
-                # Scan all we need
-                self.tower_blue.temperature = self.temperature.read_temperature_f()
-                self.return_from_blue_tower()
-            elif tower == ColorScanOptions.YELLOW.value:
-                self.go_yellow_tower()
-                # Scan all we need
-                self.tower_yellow.temperature = self.temperature.read_temperature_f()
-                self.return_from_yellow_tower()
+    # def exploring_towers(self):
+    #     """
+    #     Go to each tower and exploring using all sensors
+    #     """
+    #     logging.info('Begin exploring towers ...')
+    #     # Scan all initial towers position
+    #     self.scan_finding_towers()
+    #     # Go and scan each tower in established order
+    #     for tower in self.tower_order_list:
+    #         logging.info('Go tower...' + tower)
+    #         if tower == ColorScanOptions.RED.value:
+    #             self.go_red_tower()
+    #             # Scan all we need using sensors
+    #             # Scan and verify tower color
+    #            # logging.info('Verifying tower color ...' + self.color_arm.scan_color())
+    #             # print(color_arm.scan_color())
+    #             self.tower_red.temperature = self.temperature.read_temperature_f()
+    #             self.return_from_red_tower()
+    #         elif tower == ColorScanOptions.BLUE.value:
+    #             self.go_blue_tower()
+    #             # Scan all we need
+    #             self.tower_blue.temperature = self.temperature.read_temperature_f()
+    #             self.return_from_blue_tower()
+    #         elif tower == ColorScanOptions.YELLOW.value:
+    #             self.go_yellow_tower()
+    #             # Scan all we need
+    #             self.tower_yellow.temperature = self.temperature.read_temperature_f()
+    #             self.return_from_yellow_tower()
