@@ -1,4 +1,4 @@
-# a_ev3_ctf_bot
+# a_ev3_ctf
 
 Autonomous EV3 Color Tower Finder 
 
