@@ -1,8 +1,8 @@
-# a_ev3_ctf
+# a_ev3_cte
 
-Autonomous EV3 Color Tower Finder 
+Autonomous EV3 Color Tower Explorer 
 
-Autonomous EV3 Color Tower Finder is a lego robot that scan a field searching two color towers, red and  blue and go to each tower based in Alexa directives. 
+Autonomous EV3 Color Tower Explorer is a lego robot that scan a field searching two color towers, red and  blue and go to each tower based in Alexa directives. 
 
 At arrive each tower it check the right color, temperature, humidity, GPS position and some other variables at his location.
 
