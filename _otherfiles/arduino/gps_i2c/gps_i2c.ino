@@ -12,8 +12,12 @@ SoftwareSerial gpsSerial = SoftwareSerial(SoftrxPin, SofttxPin);
 int ledPin = 6; //LED test pin
 int ledPin2 = 5; //LED test pin
 // Enable/disable debug modes
-boolean debug_gps = true;
-boolean debug_nxt = true;
+//boolean debug_gps = true;
+//boolean debug_nxt = true;
+
+#define DEBUG_GPS
+#define DEBUG_EV3
+
 // Timer variables
 unsigned long lastRequest = 0; //the number of milliseconds from when the program started running
 int timePassed = 0; //interval time
@@ -89,9 +93,9 @@ void requestEvent()
     if (timePassed < 30 && !confirmed)
       //the datatype transaction is not yet finished
     {
-      if (debug_nxt) {
-        Serial.println(timePassed);
-      }
+#ifdef DEBUG_EV3
+      Serial.println(timePassed);
+#endif
       Wire.write(0);
       transactionNmr++; //increase the datatype
     }
@@ -101,9 +105,9 @@ void requestEvent()
       transactionNmr = transactionNmr - 1;
       Wire.write(transactionNmr); //send the understood datatype to master
       confirmed = true; //confirmed state
-      if (debug_nxt) {
-        Serial.println("confirm");
-      }
+#ifdef DEBUG_EV3
+      Serial.println("confirm");
+#endif
     }
     else if (confirmed && alive && !transfer )
       //the actual transaction starts
@@ -111,9 +115,9 @@ void requestEvent()
       //first send character to indicate the transaction is starting
       Wire.write("#");
       transfer = true;
-      if (debug_nxt) {
-        Serial.println("start");
-      }
+#ifdef DEBUG_EV3
+      Serial.println("start");
+#endif
     }
     else if (confirmed && alive && transfer)
       //the actual transaction starts
@@ -129,9 +133,9 @@ void requestEvent()
           {
             Wire.write("error");
           }
-          if (debug_nxt) {
-            Serial.println("case 0");
-          }
+#ifdef DEBUG_EV3
+          Serial.println("case 0");
+#endif
           break;
         case 1:
           if (dataAvailable)
@@ -142,10 +146,10 @@ void requestEvent()
           {
             Wire.write("error");
           }
-          if (debug_nxt) {
-            Serial.println("case 1");
-            Serial.println(gps1);
-          }
+#ifdef DEBUG_EV3
+          Serial.println("case 1");
+          Serial.println(gps1);
+#endif
           break;
         case 2:
           if (dataAvailable)
@@ -156,11 +160,10 @@ void requestEvent()
           {
             Wire.write("error");
           }
-          if (debug_nxt)
-          {
-            Serial.println("case 2");
-            Serial.println(gps2);
-          }
+#ifdef DEBUG_EV3
+          Serial.println("case 2");
+          Serial.println(gps2);
+#endif
           break;
         case 3:
           if (dataAvailable)
@@ -171,9 +174,9 @@ void requestEvent()
           {
             Wire.write("error");
           }
-          if (debug_nxt) {
-            Serial.println("case 3");
-          }
+#ifdef DEBUG_EV3
+          Serial.println("case 3");
+#endif
           break;
         case 4:
           if (dataAvailable)
@@ -184,11 +187,10 @@ void requestEvent()
           {
             Wire.write("error");
           }
-          if (debug_nxt)
-          {
-            Serial.println("case 4");
-            Serial.println(sizeof(gps4));
-          }
+#ifdef DEBUG_EV3
+          Serial.println("case 4");
+          Serial.println(sizeof(gps4));
+#endif
           break;
         case 5:
           if (dataAvailable)
@@ -199,9 +201,9 @@ void requestEvent()
           {
             Wire.write("error");
           }
-          if (debug_nxt) {
-            Serial.println("case 5");
-          }
+#ifdef DEBUG_EV3
+          Serial.println("case 5");
+#endif
           break;
         case 6:
           if (dataAvailable)
@@ -212,9 +214,9 @@ void requestEvent()
           {
             Wire.write("error");
           }
-          if (debug_nxt) {
-            Serial.println("case 6");
-          }
+#ifdef DEBUG_EV3
+          Serial.println("case 6");
+#endif
           break;
         case 7:
           if (dataAvailable)
@@ -225,9 +227,9 @@ void requestEvent()
           {
             Wire.write("error");
           }
-          if (debug_nxt) {
-            Serial.println("case 7");
-          }
+#ifdef DEBUG_EV3
+          Serial.println("case 7");
+#endif
           break;
         case 8:
           if (dataAvailable)
@@ -238,20 +240,20 @@ void requestEvent()
           {
             Wire.write("error");
           }
-          if (debug_nxt) {
-            Serial.println("case 8");
-          }
+#ifdef DEBUG_EV3
+          Serial.println("case 8");
+#endif
           break;
         default:
           Wire.write("error");
-          if (debug_nxt) {
-            Serial.println("else");
-          }
+#ifdef DEBUG_EV3
+          Serial.println("else");
+#endif
           break;
       }
       killTransaction(); //transaction finished, kill the connection
     }
-    else{
+    else {
       Wire.write(0);
     }
   }
@@ -266,7 +268,7 @@ void checkGPS() {
   }
   else {
     stringGPS[stringGPSPosition] = byteGPS; //if there is serial port data, it is put in the buffer
-    
+
     stringGPSPosition++; //and the buffer position is increased
     if (byteGPS == 13) { //if the received byte is = to 13, end of transmission
       stringGPS[stringGPSPosition + 1] = '\0'; //character to end the string
@@ -314,9 +316,9 @@ void checkGPS() {
         }
         if (gps1 == 'A') //the data is good
         {
-          if (debug_gps) {
-            Serial.println("------------------");
-          }
+#ifdef DEBUG_GPS
+          Serial.println("------------------");
+#endif
           dataAvailable = true; //data is availabe, enable this boolean
           digitalWrite(ledPin, HIGH); //enable the LED pin
           emptyStrings(); //empty previous strings
@@ -376,18 +378,17 @@ void checkGPS() {
             i++;
           }
           gps8[3] = '\0';
-          if (debug_gps)
-          {
-            Serial.println(gps0);
-            Serial.println(gps1);
-            Serial.println(gps2);
-            Serial.println(gps3);
-            Serial.println(gps4);
-            Serial.println(gps5);
-            Serial.println(gps6);
-            Serial.println(gps7);
-            Serial.println(gps8);
-          }
+#ifdef DEBUG_GPS
+          Serial.println(gps0);
+          Serial.println(gps1);
+          Serial.println(gps2);
+          Serial.println(gps3);
+          Serial.println(gps4);
+          Serial.println(gps5);
+          Serial.println(gps6);
+          Serial.println(gps7);
+          Serial.println(gps8);
+#endif
         }
       }
       stringGPSPosition = 0;
@@ -440,12 +441,10 @@ void killTransaction()
 {
   // Function to kill the transaction, used when a time out occured.
   // or when the data was succesfuly sent.
-  if (debug_nxt) {
-    Serial.println("transaction stopped");
-  }
-  if (debug_nxt) {
-    Serial.println(" ");
-  }
+#ifdef DEBUG_EV3
+  Serial.println("transaction stopped");
+  Serial.println(" ");
+#endif
   digitalWrite(ledPin2, LOW);
   alive = false;
   confirmed = false;
