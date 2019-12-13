@@ -9,6 +9,8 @@ from ev3dev2.port import LegoPort
 from time import sleep
 from smbus import SMBus
 
+NXT_SENSOR_ADDRESS =0X4C
+
 class TemperatureSensor():
     """
     Read temperature using NXT Temperature sensor
@@ -23,7 +25,7 @@ class TemperatureSensor():
         # Settings for I2C (SMBus(4) for INPUT_2)
         self.lego_bus =  SMBus(4)
         # LM75 address
-        self.address = 0x4C
+        self.address = NXT_SENSOR_ADDRESS
 
     def read_temperature_c(self):
         raw = self.lego_bus.read_word_data(self.address, 0) & 0xFFFF
