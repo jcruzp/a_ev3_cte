@@ -304,12 +304,13 @@ void checkgps() {
       return;  // we can fail to parse a sentence in which case we should just wait for another
     }
 
-
+    
     // if millis() or timer wraps around, we'll just reset it
     if (timer > millis())  timer = millis();
 
     // approximately every 2 seconds or so, print out the current stats
     if (millis() - timer > 2000) {
+      digitalWrite(ledPin, HIGH); //enable the LED pin
       timer = millis(); // reset the timer
 
       Serial.print("\nTime: ");
@@ -356,6 +357,7 @@ void checkgps() {
         Serial.print("Satellites: "); Serial.println((int)gpsSerial.satellites);
 
         dataAvailable = true;
+        
       }
     }
 
