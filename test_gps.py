@@ -11,15 +11,15 @@ import time
 import logging
 
 from time import sleep
-from libs.humidity import HumiditySensor
+from libs.gps import GPSSensor
 
 if __name__ == '__main__':
     # Startup sequence
-    gadget = HumiditySensor()
+    gadget = GPSSensor()
     while True:
-        print('Test Humidity')
-        print(gadget.read())
-        #print ('{0:0.2f}'.format(gadget.check_crc(0x4E85,0x6B)) )
-        sleep(1)
-    
-    
+        print('Test GPS')
+        data=gadget.read_latitude()
+        print(data)
+        #data=gadget.read_longitude()
+        #print(data)
+        sleep(10)

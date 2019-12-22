@@ -10,6 +10,8 @@ from time import sleep
 from enum import Enum
 from smbus import SMBus
 
+import sys
+
 import time
 
 HTDU21D_ADDRESS = 0x40
@@ -38,24 +40,41 @@ class HumiditySensor():
         sleep(0.5)
         # Settings for I2C (SMBus(4) for INPUT_2)
         self.lego_bus =  SMBus(4)
+        
         # HTU21D address
-        self.address = HTDU21D_ADDRESS
+        self.address = 0x40
 
 
     def read(self):
         """
         Read humidity from sensor and verify checksum
         """
-        data = [HTU21D_COMMANDS.TRIGGER_HUMD_MEASURE_NOHOLD]
-        self.lego_bus.write_i2c_block_data(self.address, 0, data)
-        time.sleep(0.2)
-
-        block = self.lego_bus.read_i2c_block_data(self.address, 0, 3)
-        rawhumidity = (( block[0] << 8) | block[1])
+                     
+        #self.lego_bus.write_byte(self.address, 0xF5)
+        #time.sleep(0.2)
+        block=0
+        rawhumidity=0
+        counter=0
+        toRead=0
+        while counter < 10 and toRead != 3:
+            self.lego_bus.write_byte(self.address, 0xFE)
+            self.lego_bus.write_byte(self.address, 0xF5)
+            sleep(0.05)
+            
+            try:
+                block = self.lego_bus.read_i2c_block_data(self.address, 0, 3)
+                print (block)
+                rawhumidity = (( block[0] << 8) | block[1])
+                print (rawhumidity)
+            except:
+                print("Error inesperado:", sys.exc_info()[0])
+            counter +=1
+        
 
         rh=999 # if invalid checksum return error value
-        if (check_crc(rawhumidity, block[2]) == 0):  #Verify the checksum         
-            rawhumidity &= 0xFFFC
+        if (self.check_crc(rawhumidity, block[2]) == 0):  #Verify the checksum         
+            #rawhumidity &= 0xFFFC
+            print (rawhumidity)
             tempRH = rawhumidity / 65536.0
             rh = -6.0 + (125.0 * tempRH)
         return rh

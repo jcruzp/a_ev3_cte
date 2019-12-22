@@ -3,7 +3,7 @@
 # twitter: @joseacruzp
 # github:  https://github.com/Jcruzp
 # website: https://sites.google.com/view/raeiot
-from ev3dev2.sensor import INPUT_2
+from ev3dev2.sensor import INPUT_4
 from ev3dev2.port import LegoPort
 
 from time import sleep
@@ -19,11 +19,11 @@ class TemperatureSensor():
     def __init__(self):
           
         # Set LEGO port for NXT Temp sensor
-        lego_port = LegoPort(INPUT_2)
+        lego_port = LegoPort(INPUT_4)
         lego_port.mode = 'other-i2c'
         sleep(0.5)
         # Settings for I2C (SMBus(4) for INPUT_2)
-        self.lego_bus =  SMBus(4)
+        self.lego_bus =  SMBus(6)
         # LM75 address
         self.address = NXT_SENSOR_ADDRESS
 
