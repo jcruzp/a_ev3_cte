@@ -7,61 +7,59 @@ from ev3dev2.sensor import INPUT_2
 from ev3dev2.port import LegoPort
 
 from time import sleep
-from enum import Enum
+from enum import Enum, IntEnum
 from smbus import SMBus
 
 from libs.arduino_i2c import ArduinoI2C
 import sys
 import time
 
-GPS_ADDRESS = 0x70
 
-class GPSCommands(Enum):
+
+
+class GPSCommands(IntEnum):
     """
     List of GPS Commands
     """
     LATITUDE = 2
     LAT = 3
     LONGITUDE = 4
-    LONG = 5
-    
- 
+    LON = 5
+
+
+DATA_ERROR = "Error"
+
+GPS_NO_DATA = 254
+
 class GPSSensor(ArduinoI2C):
     """
     Read GPS latitude and longitude
     """
 
     def __init__(self):
-          
+
         ArduinoI2C.__init__(self)
 
-
     def read_latitude(self):
-        #while True:
-        latitude=self.read_arduino(7,8)
-        latitudestr=''.join(map(chr,latitude))
-        #    if 254 not in latitude: 
-        #        break 
-        #    else:
-        #        sleep(1)
-         
+        latitude = self.read_arduino(GPSCommands.LATITUDE, 12)
+        latitudestr = ''.join(map(chr, latitude))
+
         print(latitude)
-        #while True: 
-        lat = self.read_arduino(5,1)
-        latstr=''.join(map(chr,lat))
-        #    if 254 not in lat: 
-        #        break 
-        #    else:
-        #        sleep(1)
-           
+
+        lat = self.read_arduino(GPSCommands.LAT, 1)
+        latstr = ''.join(map(chr, lat))
+
         print(lat)
-        return latitudestr + latstr
-    
+        return DATA_ERROR if (GPS_NO_DATA in latitude) or (GPS_NO_DATA in lat) else latitudestr + latstr
+
     def read_longitude(self):
-        while True:
-            longitude=''.join(map(chr,self.read_arduino(GPSCommands.LONGITUDE.value,12)))
-            if longitude != "error": break
-        while True:    
-            lon=''.join(map(chr,self.read_arduino(GPSCommands.LONG.value,1)))
-            if lon != "error": break
-        return longitude + lon
+        longitude = self.read_arduino(GPSCommands.LONGITUDE, 12)
+        longitudestr = ''.join(map(chr, longitude))
+
+        print(longitude)
+
+        lon = self.read_arduino(GPSCommands.LON, 1)
+        lonstr = ''.join(map(chr, lon))
+
+        print(lon)
+        return DATA_ERROR if (GPS_NO_DATA in longitude) or (GPS_NO_DATA in lon) else longitudestr + lonstr

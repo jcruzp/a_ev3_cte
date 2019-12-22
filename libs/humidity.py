@@ -3,11 +3,11 @@
 # twitter: @joseacruzp
 # github:  https://github.com/Jcruzp
 # website: https://sites.google.com/view/raeiot
-from ev3dev2.sensor import INPUT_2
+from ev3dev2.sensor import INPUT_4
 from ev3dev2.port import LegoPort
 
 from time import sleep
-from enum import Enum
+from enum import IntEnum
 from smbus import SMBus
 
 import sys
@@ -18,7 +18,7 @@ HTDU21D_ADDRESS = 0x40
 
 SHIFTED_DIVISOR = 0x988000
 
-class HTU21D_COMMANDS(Enum):
+class HTU21D_COMMANDS(IntEnum):
     TRIGGER_TEMP_MEASURE_HOLD=0xE3
     TRIGGER_HUMD_MEASURE_HOLD=0xE5
     TRIGGER_TEMP_MEASURE_NOHOLD=0xF3
@@ -35,11 +35,11 @@ class HumiditySensor():
     def __init__(self):
           
         # Set LEGO port for HTU21D sensor
-        lego_port = LegoPort(INPUT_2)
+        lego_port = LegoPort(INPUT_4)
         lego_port.mode = 'other-i2c'
         sleep(0.5)
         # Settings for I2C (SMBus(4) for INPUT_2)
-        self.lego_bus =  SMBus(4)
+        self.lego_bus =  SMBus(6)
         
         # HTU21D address
         self.address = 0x40
@@ -57,7 +57,7 @@ class HumiditySensor():
         counter=0
         toRead=0
         while counter < 10 and toRead != 3:
-            self.lego_bus.write_byte(self.address, 0xFE)
+            #self.lego_bus.write_byte(self.address, 0xFE)
             self.lego_bus.write_byte(self.address, 0xF5)
             sleep(0.05)
             

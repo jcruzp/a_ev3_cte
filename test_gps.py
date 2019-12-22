@@ -20,6 +20,8 @@ if __name__ == '__main__':
         print('Test GPS')
         data=gadget.read_latitude()
         print(data)
+        data=gadget.read_longitude()
+        print(data)
         #data=gadget.read_longitude()
         #print(data)
         sleep(10)

@@ -14,7 +14,7 @@ from smbus import SMBus
 from time import sleep
 from enum import Enum
 
-class SignatureColor(Enum):
+class SignatureColor(IntEnum):
     NONE = 0
     RED = 1
     BLUE = 2
