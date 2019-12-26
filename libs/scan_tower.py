@@ -24,7 +24,7 @@ class TowerPosition(Enum):
 
 class ScanTower():
     """
-    Move turn table right and left to scan with ultrasonic sensor
+    Move turn table right and left to scan with pixy2 cam and Gyro
     """
 
     def __init__(self):

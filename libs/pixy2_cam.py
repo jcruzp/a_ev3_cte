@@ -12,7 +12,7 @@ from ev3dev2.port import LegoPort
 
 from smbus import SMBus
 from time import sleep
-from enum import Enum
+from enum import IntEnum
 
 class SignatureColor(IntEnum):
     NONE = 0

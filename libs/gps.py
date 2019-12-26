@@ -3,28 +3,21 @@
 # twitter: @joseacruzp
 # github:  https://github.com/Jcruzp
 # website: https://sites.google.com/view/raeiot
-from ev3dev2.sensor import INPUT_2
-from ev3dev2.port import LegoPort
-
 from time import sleep
-from enum import Enum, IntEnum
+from enum import IntEnum
 from smbus import SMBus
 
 from libs.arduino_i2c import ArduinoI2C
-import sys
-import time
-
-
 
 
 class GPSCommands(IntEnum):
     """
     List of GPS Commands
     """
-    LATITUDE = 2
-    LAT = 3
-    LONGITUDE = 4
-    LON = 5
+    CMD_GET_LATITUDE = 2
+    CMD_GET_LAT = 3
+    CMD_GET_LONGITUDE = 4
+    CMD_GET_LON = 5
 
 
 DATA_ERROR = "Error"
@@ -33,7 +26,7 @@ GPS_NO_DATA = 254
 
 class GPSSensor(ArduinoI2C):
     """
-    Read GPS latitude and longitude
+    Read GPS latitude and longitude using an Arduino Pro to convert GPS uart data to I2C data
     """
 
     def __init__(self):
@@ -41,25 +34,25 @@ class GPSSensor(ArduinoI2C):
         ArduinoI2C.__init__(self)
 
     def read_latitude(self):
-        latitude = self.read_arduino(GPSCommands.LATITUDE, 12)
+        latitude = self.read_arduino(GPSCommands.CMD_GET_LATITUDE, 12)
         latitudestr = ''.join(map(chr, latitude))
 
-        print(latitude)
+        #print(latitude)
 
-        lat = self.read_arduino(GPSCommands.LAT, 1)
+        lat = self.read_arduino(GPSCommands.CMD_GET_LAT, 1)
         latstr = ''.join(map(chr, lat))
 
-        print(lat)
+        #print(lat)
         return DATA_ERROR if (GPS_NO_DATA in latitude) or (GPS_NO_DATA in lat) else latitudestr + latstr
 
     def read_longitude(self):
-        longitude = self.read_arduino(GPSCommands.LONGITUDE, 12)
+        longitude = self.read_arduino(GPSCommands.CMD_GET_LONGITUDE, 12)
         longitudestr = ''.join(map(chr, longitude))
 
-        print(longitude)
+        #print(longitude)
 
-        lon = self.read_arduino(GPSCommands.LON, 1)
+        lon = self.read_arduino(GPSCommands.CMD_GET_LON, 1)
         lonstr = ''.join(map(chr, lon))
 
-        print(lon)
+        #print(lon)
         return DATA_ERROR if (GPS_NO_DATA in longitude) or (GPS_NO_DATA in lon) else longitudestr + lonstr
