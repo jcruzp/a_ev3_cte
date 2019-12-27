@@ -43,7 +43,7 @@ class GPSSensor(ArduinoI2C):
         latstr = ''.join(map(chr, lat))
 
         #print(lat)
-        return DATA_ERROR if (GPS_NO_DATA in latitude) or (GPS_NO_DATA in lat) else latitudestr + latstr
+        return DATA_ERROR if (GPS_NO_DATA in latitude) or (GPS_NO_DATA in lat) else latitudestr + " degrees " + latstr
 
     def read_longitude(self):
         longitude = self.read_arduino(GPSCommands.CMD_GET_LONGITUDE, 12)
@@ -55,4 +55,4 @@ class GPSSensor(ArduinoI2C):
         lonstr = ''.join(map(chr, lon))
 
         #print(lon)
-        return DATA_ERROR if (GPS_NO_DATA in longitude) or (GPS_NO_DATA in lon) else longitudestr + lonstr
+        return DATA_ERROR if (GPS_NO_DATA in longitude) or (GPS_NO_DATA in lon) else longitudestr + " degrees " + lonstr

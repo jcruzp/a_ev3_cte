@@ -7,6 +7,13 @@
 # THESE MATERIALS ARE PROVIDED ON AN "AS IS" BASIS. AMAZON SPECIFICALLY DISCLAIMS, WITH
 # RESPECT TO THESE MATERIALS, ALL WARRANTIES, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
 # THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+#
+# Jose Cruz - 2019
+# email: joseacruzp@gmail.com
+# twitter: @joseacruzp
+# github:  https://github.com/Jcruzp
+# website: https://sites.google.com/view/raeiot
+from libs.arduino_i2c import ArduinoI2C
 
 from ev3dev2.led import Leds
 from ev3dev2.sound import Sound
@@ -23,6 +30,8 @@ from agt import AlexaGadget
 from libs.color_arm import ColorArm
 from libs.navegation_map import NavegationMap
 from libs.temperature import TemperatureSensor
+from libs.humidity import HumiditySensor
+from libs.gps import GPSSensor
 
 # Set the logging level to INFO to see messages from AlexaGadget
 logging.basicConfig(level=logging.INFO)
@@ -126,18 +135,19 @@ class MindstormsGadget(AlexaGadget):
             control_type = payload["type"]
             # Retrieve robot position
             self.botposition = payload["botposition"]
+            print(control_type)
 
             # Process all directives
-            if control_type == DirectiveName.READ_CONDITIONS:
+            if control_type == DirectiveName.READ_CONDITIONS.value:
                 self._read_conditions(payload["condition"])
 
-            if control_type == DirectiveName.RETURN_BASE:
+            if control_type == DirectiveName.RETURN_BASE.value:
                 self._return_base()
 
-            if control_type == DirectiveName.VERIFY_COLOR:
+            if control_type == DirectiveName.VERIFY_COLOR.value:
                 self._verify_color()
 
-            if control_type == DirectiveName.EXPLORING_TOWERS:
+            if control_type == DirectiveName.EXPLORING_TOWERS.value:
                 self._exploring_towers(
                     payload["towerColorA"], payload["towerColorB"])
 
@@ -149,37 +159,39 @@ class MindstormsGadget(AlexaGadget):
         Read temperature at tower using temperature sensor
         """
         temperature = TemperatureSensor()
-        self._send_event(EventName.TEMPERATURE, {
+        self._send_event(EventName.TEMPERATURE.value, {
             'speechOut': "Temperature at " + self.botposition + " is " + temperature.read_temperature_f() + " degrees fahrenheit"})
 
     def _read_relative_humidity(self):
         """
         Read humidity at tower using humidity sensor
         """
-        self._send_event(EventName.HUMIDITY, {
-            'speechOut': "Relative humidity at " + self.botposition + " is 20%"})
+        humidity = HumiditySensor()
+        self._send_event(EventName.HUMIDITY.value, {
+            'speechOut': "Relative humidity at " + self.botposition + " is " + humidity.read_humidity() + " %"})
 
     def _read_gps_position(self):
         """
         Read GPS latitude and longitude coordinates
         """
-        self._send_event(EventName.GPS, {
-            'speechOut': "GPS coordinates at " + self.botposition + " are latitude 10 degrees and longitude 30 degrees"})
+        gpsdata=GPSSensor()
+        self._send_event(EventName.GPS.value, {
+            'speechOut': "GPS coordinates at " + self.botposition + " are latitude " + gpsdata.read_latitude() + " and longitude " + gpsdata.read_longitude() })
 
     def _read_conditions(self, condition):
         """
         Read one or all conditions at each tower
         """
-        if (condition == ConditionName.AMBIENTE_TEMPERATURE):
+        if (condition == ConditionName.AMBIENTE_TEMPERATURE.value):
             self._read_ambiente_temperature()
 
-        if (condition == ConditionName.RELATIVE_HUMIDITY):
+        if (condition == ConditionName.RELATIVE_HUMIDITY.value):
             self._read_relative_humidity()
 
-        if (condition == ConditionName.GPS_POSITION):
+        if (condition == ConditionName.GPS_POSITION.value):
             self._read_gps_position()
         # Read all conditions and sent events to Alexa
-        if (condition == ConditionName.ALL_CONDITIONS):
+        if (condition == ConditionName.ALL_CONDITIONS.value):
             self._read_ambiente_temperature()
             self._read_relative_humidity()
             self._read_gps_position()
@@ -188,13 +200,13 @@ class MindstormsGadget(AlexaGadget):
         """
         Robot return to base from current tower
         """
-        if (self.botposition == RobotPosition.ROBOT_AT_RED_TOWER):
+        if (self.botposition == RobotPosition.ROBOT_AT_RED_TOWER.value):
             self.nav_map.return_from_red_tower()
-        if (self.botposition == RobotPosition.ROBOT_AT_BLUE_TOWER):
+        if (self.botposition == RobotPosition.ROBOT_AT_BLUE_TOWER.value):
             self.nav_map.return_from_blue_tower()
-        self._send_event(EventName.ARRIVE_BASE, {
+        self._send_event(EventName.ARRIVE_BASE.value, {
             'speechOut': "Robot arrive at base",
-            'botPosition': RobotPosition.ROBOT_AT_BASE})
+            'botPosition': RobotPosition.ROBOT_AT_BASE.value})
 
     def _verify_color(self):
         """
@@ -202,7 +214,7 @@ class MindstormsGadget(AlexaGadget):
         """
         color_arm = ColorArm()
         tower_color = color_arm.scan_color()
-        self._send_event(EventName.HUMIDITY, {
+        self._send_event(EventName.COLOR.value, {
             'speechOut': "The scanned color at " + self.botposition + " is " + tower_color})
 
     def _exploring_towers(self, towerColorA, towerColorB):
@@ -218,10 +230,10 @@ class MindstormsGadget(AlexaGadget):
             # Scan all initial towers position
             self.nav_map.scan_finding_towers()
             logging.info('Going ' + towerColorA + ' tower')
-            self.nav_map.go_color_tower(towerColorA)
-            self._send_event(EventName.ARRIVE_TOWER, {
+            self.nav_map.go_color_tower(towerColorA.capitalize())
+            self._send_event(EventName.ARRIVE_TOWER.value, {
                 'speechOut': "Robot arrive at " + towerColorA + " tower",
-                'botPosition': + towerColorA + " tower"})
+                'botPosition': towerColorA + " tower"})
         # Autonomous explorer workflow
         else:
             logging.info('Begin autonomous exploring towers ...')
@@ -231,21 +243,21 @@ class MindstormsGadget(AlexaGadget):
             self.nav_map.scan_finding_towers()
             for tower_color in self.nav_map.tower_order_list:
                 # Robot go each tower
-                logging.info('Going ' + tower_color + ' tower')
-                self._send_event(EventName.GOING_TOWER, {
-                    'speechOut': "Robot is going to the " + tower_color + " tower"})
-                self.nav_map.go_color_tower(tower_color)
-                self._send_event(EventName.ARRIVE_TOWER_AUTO, {
-                    'speechOut': "Robot arrive " + tower_color + " tower",
-                    'botPosition': + tower_color + " tower"})
+                logging.info('Going ' + tower_color.value + ' tower')
+                self._send_event(EventName.GOING_TOWER.value, {
+                    'speechOut': "Robot is going to the " + tower_color.value + " tower"})
+                self.nav_map.go_color_tower(tower_color.value)
+                self._send_event(EventName.ARRIVE_TOWER_AUTO.value, {
+                    'speechOut': "Robot arrive " + tower_color.value + " tower",
+                    'botPosition': tower_color.value + " tower"})
                 time.sleep(1)
                 # At arrive tower read all conditions
-                self._send_event(EventName.ALLCONDITIONS, {
-                    'speechOut': "Reading all conditions at " + tower_color + " tower"})
-                self._read_conditions(ConditionName.ALL_CONDITIONS)
+                self._send_event(EventName.ALLCONDITIONS.value, {
+                    'speechOut': "Reading all conditions at " + tower_color.value + " tower"})
+                self._read_conditions(ConditionName.ALL_CONDITIONS.value)
                 time.sleep(1)
                 # And return base
-                self._send_event(EventName.RETURN_BASE, {
+                self._send_event(EventName.RETURN_BASE.value, {
                     'speechOut': "Robot is returning to the base"})
                 self._return_base()
 
@@ -340,13 +352,13 @@ class MindstormsGadget(AlexaGadget):
     #     if direction in Direction.RIGHT.value:
     #         self.drive.on_for_seconds(SpeedPercent(speed), SpeedPercent(0), 2)
 
-    def _send_event(self, name: EventName, payload):
+    def _send_event(self, name, payload):
         """
         Sends a custom event to trigger a sentry action.
         :param name: the name of the custom event
         :param payload: the sentry JSON payload
         """
-        self.send_custom_event('Custom.Mindstorms.Gadget', name.value, payload)
+        self.send_custom_event('Custom.Mindstorms.Gadget', name, payload)
 
     # def _proximity_thread(self):
     #     """

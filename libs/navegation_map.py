@@ -78,11 +78,11 @@ class NavegationMap():
         pixy2.turn_lamp_on()
 
         logging.info('Scanning tower red...')
-        self.tower_red = TowerData(SignatureColor.RED.value)
+        self.tower_red = TowerData(SignatureColor.RED)
         logging.info('Tower red at X:' + str(self.tower_red.coord_x))
 
         logging.info('Scanning tower blue...')
-        self.tower_blue = TowerData(SignatureColor.BLUE.value)
+        self.tower_blue = TowerData(SignatureColor.BLUE)
         logging.info('Tower blue at X:' + str(self.tower_blue.coord_x))
 
         #logging.info('Scanning tower yellow...')

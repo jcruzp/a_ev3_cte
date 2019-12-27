@@ -77,7 +77,7 @@ class Pixy2Cam():
 
     def object_distance(self, object_width=1):
         """
-        Calculte object distance in inches based on camera focal length.
+        Calculate object distance in inches based on camera focal length.
         W know width of object 
         D know distance from camera before take a picture
         P know width in pixeles of object at distance D

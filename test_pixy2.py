@@ -36,7 +36,7 @@ while not ts.value():
     # Clear display
     lcd.clear()
     
-    data_cam=pixy2.find_object(1)
+    data_cam=pixy2.find_object(2)
       
     sig =data_cam['sig']
     x = data_cam['x']
