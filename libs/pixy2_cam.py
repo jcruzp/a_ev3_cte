@@ -85,9 +85,9 @@ class Pixy2Cam():
         D = (W x F) / P
         :param object_width: width in pixeles for object detected by signature
         """
-        W = 1 # 1 inche tower width
-        D = 12 # 12 inches distance form tower to cam before take a picture
-        P = 22 # at 12 inches the 1 inch tower width see with 22 pixeles in cam image
+        W = 8.5 # 1 inche tower width
+        D = 54 # 12 inches distance form tower to cam before take a picture
+        P = 44 # at 12 inches the 1 inch tower width see with 22 pixeles in cam image
         F = (P * D) / W
         D = (W * F) / object_width # object_width is new P object width
         return D

@@ -18,8 +18,8 @@ if __name__ == '__main__':
     gadget = HumiditySensor()
     while True:
         print('Test Humidity')
-        print(gadget.read_humidity())
-        #print ('{0:0.2f}'.format(gadget.check_crc(0x4E85,0x6B)) )
+        #print(gadget.read_humidity())
+        print ('{0:0.2f}'.format(gadget.read_humidity()) )
         sleep(1)
     
     

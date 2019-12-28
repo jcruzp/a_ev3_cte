@@ -18,6 +18,6 @@ class HumiditySensor(ArduinoI2C):
         ArduinoI2C.__init__(self)
 
     def read_humidity(self):
-        humidity = self.read_arduino(CMD_GET_HUMIDITY, 8)
+        humidity = self.read_arduino(CMD_GET_HUMIDITY, 7)
         humiditystr = ''.join(map(chr, humidity))
-        return humiditystr
+        return float(humiditystr.lstrip())

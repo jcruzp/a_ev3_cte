@@ -19,7 +19,7 @@ from libs.color_arm import ColorScanOptions
 MIN_LEFT = 140
 MAX_RIGHT = 172
 # Max inches from bot to arrives tower
-MAX_INCHES_TOWER = 5
+MAX_INCHES_TOWER =15.0
 
 pixy2 = Pixy2Cam()
 logging.basicConfig(level=logging.INFO)
@@ -97,7 +97,7 @@ class NavegationMap():
         """
         Move forward until arrive at tower position
         """
-        logging.info('Arriving tower color ' + str(tower_color.color))
+        logging.info('Arriving tower color ' + str(tower_color.color.value))
         self.steps_forward = 0
         # bot move until arrive at tower position
         while pixy2.object_distance(tower_color.pixeles_width()) > MAX_INCHES_TOWER:
@@ -106,7 +106,13 @@ class NavegationMap():
             self.steps_forward += 1
         # turn lamp off
         pixy2.turn_lamp_off()
-        
+        self.bot.move_forward()
+        self.bot.move_forward()
+        self.bot.move_forward()
+        self.bot.move_forward()
+        self.steps_forward += 4
+        #self.bot.move_forward()
+      
 
     def go_right(self, backward=False):
         """
@@ -123,8 +129,10 @@ class NavegationMap():
             self.bot.move_backward()
             self.bot.move_backward()
             self.bot.move_backward()
+            self.bot.move_backward()
         else:
             logging.info('Going right forward...')
+            self.bot.move_forward()
             self.bot.move_forward()
             self.bot.move_forward()
             self.bot.move_forward()
@@ -149,8 +157,10 @@ class NavegationMap():
             self.bot.move_backward()
             self.bot.move_backward()
             self.bot.move_backward()
+            self.bot.move_backward()
         else:
             logging.info('Going left forward...')
+            self.bot.move_forward()
             self.bot.move_forward()
             self.bot.move_forward()
             self.bot.move_forward()
@@ -210,6 +220,7 @@ class NavegationMap():
         # turn lamp on
         pixy2.turn_lamp_on()
         self.go_until_near_tower(self.tower_blue)
+        logging.info('Near tower...')
 
     def return_from_blue_tower(self):
         """

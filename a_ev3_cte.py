@@ -22,7 +22,7 @@ import json
 import logging
 import random
 import threading
-import time
+from time import sleep
 from enum import Enum
 
 from agt import AlexaGadget
@@ -94,7 +94,7 @@ class MindstormsGadget(AlexaGadget):
         super().__init__()
 
         # Robot initial position
-        self.botposition = RobotPosition.ROBOT_AT_BASE
+        self.botposition = RobotPosition.ROBOT_AT_BASE.value
 
         self.sound = Sound()
         self.leds = Leds()
@@ -135,7 +135,6 @@ class MindstormsGadget(AlexaGadget):
             control_type = payload["type"]
             # Retrieve robot position
             self.botposition = payload["botposition"]
-            print(control_type)
 
             # Process all directives
             if control_type == DirectiveName.READ_CONDITIONS.value:
@@ -160,7 +159,7 @@ class MindstormsGadget(AlexaGadget):
         """
         temperature = TemperatureSensor()
         self._send_event(EventName.TEMPERATURE.value, {
-            'speechOut': "Temperature at " + self.botposition + " is " + temperature.read_temperature_f() + " degrees fahrenheit"})
+            'speechOut': "Temperature at " + self.botposition + " is {0:0.2f} ".format(temperature.read_temperature_f()) + " degrees fahrenheit"})
 
     def _read_relative_humidity(self):
         """
@@ -168,15 +167,29 @@ class MindstormsGadget(AlexaGadget):
         """
         humidity = HumiditySensor()
         self._send_event(EventName.HUMIDITY.value, {
-            'speechOut': "Relative humidity at " + self.botposition + " is " + humidity.read_humidity() + " %"})
+            'speechOut': "Relative humidity at " + self.botposition + " is {0:0.2f} ".format(humidity.read_humidity()) + " percent"})
 
     def _read_gps_position(self):
         """
         Read GPS latitude and longitude coordinates
         """
-        gpsdata=GPSSensor()
+        gpsdata = GPSSensor()
         self._send_event(EventName.GPS.value, {
-            'speechOut': "GPS coordinates at " + self.botposition + " are latitude " + gpsdata.read_latitude() + " and longitude " + gpsdata.read_longitude() })
+            'speechOut': "GPS coordinates at " + self.botposition + " are latitude " + gpsdata.read_latitude().strip() + " and longitude " + gpsdata.read_longitude() })
+        #self._send_event(EventName.GPS.value, {
+        #    'speechOut': "GPS coordinates at " + self.botposition + " are latitude 1015 N  and longitude 6757 W"})
+        
+    def _read_all_conditions(self):
+        """
+        Read all conditions
+        """   
+        temperature = TemperatureSensor()
+        humidity = HumiditySensor()
+        gpsdata = GPSSensor()
+        self._send_event(EventName.ALLCONDITIONS.value, {
+            'speechOut': "At " + self.botposition + " Temperature is {0:0.2f} ".format(temperature.read_temperature_f()) + " degrees fahrenheit.,,," +
+                         "Relative humidity is {0:0.2f} ".format(humidity.read_humidity()) + " percent.,,," +
+                         "GPS coordinates are latitude, " + gpsdata.read_latitude().strip() + " and longitude, " + gpsdata.read_longitude() })
 
     def _read_conditions(self, condition):
         """
@@ -190,11 +203,9 @@ class MindstormsGadget(AlexaGadget):
 
         if (condition == ConditionName.GPS_POSITION.value):
             self._read_gps_position()
-        # Read all conditions and sent events to Alexa
+       
         if (condition == ConditionName.ALL_CONDITIONS.value):
-            self._read_ambiente_temperature()
-            self._read_relative_humidity()
-            self._read_gps_position()
+           self._read_all_conditions()
 
     def _return_base(self):
         """
@@ -205,7 +216,7 @@ class MindstormsGadget(AlexaGadget):
         if (self.botposition == RobotPosition.ROBOT_AT_BLUE_TOWER.value):
             self.nav_map.return_from_blue_tower()
         self._send_event(EventName.ARRIVE_BASE.value, {
-            'speechOut': "Robot arrive at base",
+            'speechOut': "Explorer arrive at base",
             'botPosition': RobotPosition.ROBOT_AT_BASE.value})
 
     def _verify_color(self):
@@ -231,8 +242,9 @@ class MindstormsGadget(AlexaGadget):
             self.nav_map.scan_finding_towers()
             logging.info('Going ' + towerColorA + ' tower')
             self.nav_map.go_color_tower(towerColorA.capitalize())
+            logging.info('Explorer arrive at tower...' + towerColorA)
             self._send_event(EventName.ARRIVE_TOWER.value, {
-                'speechOut': "Robot arrive at " + towerColorA + " tower",
+                'speechOut': "Explorer arrive at " + towerColorA + " tower",
                 'botPosition': towerColorA + " tower"})
         # Autonomous explorer workflow
         else:
@@ -243,114 +255,23 @@ class MindstormsGadget(AlexaGadget):
             self.nav_map.scan_finding_towers()
             for tower_color in self.nav_map.tower_order_list:
                 # Robot go each tower
-                logging.info('Going ' + tower_color.value + ' tower')
+                logging.info('Going ' + tower_color + ' tower')
                 self._send_event(EventName.GOING_TOWER.value, {
-                    'speechOut': "Robot is going to the " + tower_color.value + " tower"})
-                self.nav_map.go_color_tower(tower_color.value)
+                    'speechOut': "Explorer is going to the " + tower_color + " tower"})
+                self.nav_map.go_color_tower(tower_color)
                 self._send_event(EventName.ARRIVE_TOWER_AUTO.value, {
-                    'speechOut': "Robot arrive " + tower_color.value + " tower",
-                    'botPosition': tower_color.value + " tower"})
-                time.sleep(1)
+                    'speechOut': "Explorer arrive " + tower_color + " tower",
+                    'botPosition': tower_color + " tower"})
+                sleep(10)
                 # At arrive tower read all conditions
                 self._send_event(EventName.ALLCONDITIONS.value, {
-                    'speechOut': "Reading all conditions at " + tower_color.value + " tower"})
+                    'speechOut': "Reading all conditions at " + tower_color + " tower"})
                 self._read_conditions(ConditionName.ALL_CONDITIONS.value)
-                time.sleep(1)
+                sleep(20)
                 # And return base
                 self._send_event(EventName.RETURN_BASE.value, {
-                    'speechOut': "Robot is returning to the base"})
+                    'speechOut': "Explorer is returning to the base"})
                 self._return_base()
-
-    # def _move(self, direction, duration: int, speed: int, is_blocking=False):
-    #     """
-    #     Handles move commands from the directive.
-    #     Right and left movement can under or over turn depending on the surface type.
-    #     :param direction: the move direction
-    #     :param duration: the duration in seconds
-    #     :param speed: the speed percentage as an integer
-    #     :param is_blocking: if set, motor run until duration expired before accepting another command
-    #     """
-    #     print("Move command: ({}, {}, {}, {})".format(
-    #         direction, speed, duration, is_blocking))
-    #     if direction in Direction.FORWARD.value:
-    #         self.drive.on_for_seconds(SpeedPercent(speed), SpeedPercent(
-    #             speed), duration, block=is_blocking)
-
-    #     if direction in Direction.BACKWARD.value:
-    #         self.drive.on_for_seconds(
-    #             SpeedPercent(-speed), SpeedPercent(-speed), duration, block=is_blocking)
-
-    #     if direction in (Direction.RIGHT.value + Direction.LEFT.value):
-    #         self._turn(direction, speed)
-    #         self.drive.on_for_seconds(SpeedPercent(speed), SpeedPercent(
-    #             speed), duration, block=is_blocking)
-
-    #     if direction in Direction.STOP.value:
-    #         self.drive.off()
-    #         self.patrol_mode = False
-
-    # def _activate(self, command, speed=50):
-    #     """
-    #     Handles preset commands.
-    #     :param command: the preset command
-    #     :param speed: the speed if applicable
-    #     """
-    #     print("Activate command: ({}, {})".format(command, speed))
-    #     if command in Command.MOVE_CIRCLE.value:
-    #         self.drive.on_for_seconds(SpeedPercent(
-    #             int(speed)), SpeedPercent(5), 12)
-
-    #     if command in Command.MOVE_SQUARE.value:
-    #         for i in range(4):
-    #             self._move("right", 2, speed, is_blocking=True)
-
-    #     if command in Command.PATROL.value:
-    #         # Set patrol mode to resume patrol thread processing
-    #         self.patrol_mode = True
-
-    #     if command in Command.SENTRY.value:
-    #         self.sentry_mode = True
-    #         self._send_event(EventName.SPEECH, {
-    #                          'speechOut': "Sentry mode activated"})
-
-    #         # Perform Shuffle posture
-    #         self.drive.on_for_seconds(SpeedPercent(80), SpeedPercent(-80), 0.2)
-    #         time.sleep(0.3)
-    #         self.drive.on_for_seconds(SpeedPercent(-40), SpeedPercent(40), 0.2)
-
-    #         self.leds.set_color("LEFT", "YELLOW", 1)
-    #         self.leds.set_color("RIGHT", "YELLOW", 1)
-
-    #     if command in Command.FIRE_ONE.value:
-    #         print("Fire one")
-    #         self.weapon.on_for_rotations(SpeedPercent(100), 3)
-    #         self._send_event(EventName.SENTRY, {'fire': 1})
-    #         self.sentry_mode = False
-    #         print("Sent sentry event - 1 shot, alarm reset")
-    #         self.leds.set_color("LEFT", "GREEN", 1)
-    #         self.leds.set_color("RIGHT", "GREEN", 1)
-
-    #     if command in Command.FIRE_ALL.value:
-    #         print("Fire all")
-    #         self.weapon.on_for_rotations(SpeedPercent(100), 10)
-    #         self._send_event(EventName.SENTRY, {'fire': 3})
-    #         self.sentry_mode = False
-    #         print("sent sentry event - 3 shots, alarm reset")
-    #         self.leds.set_color("LEFT", "GREEN", 1)
-    #         self.leds.set_color("RIGHT", "GREEN", 1)
-
-    # def _turn(self, direction, speed):
-    #     """
-    #     Turns based on the specified direction and speed.
-    #     Calibrated for hard smooth surface.
-    #     :param direction: the turn direction
-    #     :param speed: the turn speed
-    #     """
-    #     if direction in Direction.LEFT.value:
-    #         self.drive.on_for_seconds(SpeedPercent(0), SpeedPercent(speed), 2)
-
-    #     if direction in Direction.RIGHT.value:
-    #         self.drive.on_for_seconds(SpeedPercent(speed), SpeedPercent(0), 2)
 
     def _send_event(self, name, payload):
         """
@@ -359,50 +280,6 @@ class MindstormsGadget(AlexaGadget):
         :param payload: the sentry JSON payload
         """
         self.send_custom_event('Custom.Mindstorms.Gadget', name, payload)
-
-    # def _proximity_thread(self):
-    #     """
-    #     Monitors the distance between the robot and an obstacle when sentry mode is activated.
-    #     If the minimum distance is breached, send a custom event to trigger action on
-    #     the Alexa skill.
-    #     """
-    #     count = 0
-    #     while True:
-    #         while self.sentry_mode:
-    #             #distance = self.ir.proximity
-    #             distance = self.us.distance_centimeters_continuous
-    #             print("Proximity: {}".format(distance))
-    #             count = count + 1 if distance < 10 else 0
-    #             if count > 3:
-    #                 print("Proximity breached. Sending event to skill")
-    #                 self.leds.set_color("LEFT", "RED", 1)
-    #                 self.leds.set_color("RIGHT", "RED", 1)
-
-    #                 self._send_event(EventName.PROXIMITY, {
-    #                                  'distance': distance})
-    #                 self.sentry_mode = False
-
-    #             time.sleep(0.2)
-    #         time.sleep(1)
-
-    # def _patrol_thread(self):
-    #     """
-    #     Performs random movement when patrol mode is activated.
-    #     """
-    #     while True:
-    #         while self.patrol_mode:
-    #             print("Patrol mode activated randomly picks a path")
-    #             direction = random.choice(list(Direction))
-    #             duration = random.randint(1, 5)
-    #             speed = random.randint(1, 4) * 25
-
-    #             while direction == Direction.STOP:
-    #                 direction = random.choice(list(Direction))
-
-    #             # direction: all except stop, duration: 1-5s, speed: 25, 50, 75, 100
-    #             self._move(direction.value[0], duration, speed)
-    #             time.sleep(duration)
-    #         time.sleep(1)
 
 
 if __name__ == '__main__':
