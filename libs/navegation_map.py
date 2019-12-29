@@ -129,7 +129,7 @@ class NavegationMap():
             self.bot.move_backward()
             self.bot.move_backward()
             self.bot.move_backward()
-            self.bot.move_backward()
+            #self.bot.move_backward()
         else:
             logging.info('Going right forward...')
             self.bot.move_forward()
@@ -140,7 +140,7 @@ class NavegationMap():
             self.bot.move_forward()
             self.bot.move_forward()
             self.bot.move_forward()
-            self.bot.move_forward()
+            #self.bot.move_forward()
 
     def go_left(self, backward=False):
         """
@@ -157,7 +157,7 @@ class NavegationMap():
             self.bot.move_backward()
             self.bot.move_backward()
             self.bot.move_backward()
-            self.bot.move_backward()
+            #self.bot.move_backward()
         else:
             logging.info('Going left forward...')
             self.bot.move_forward()
@@ -168,7 +168,7 @@ class NavegationMap():
             self.bot.move_forward()
             self.bot.move_forward()
             self.bot.move_forward()
-            self.bot.move_forward()
+            #self.bot.move_forward()
 
     def go_red_tower(self):
         """
@@ -179,6 +179,7 @@ class NavegationMap():
         """
         logging.info('Going to red tower...')
         self.go_left()
+        self.bot.turn_center()
         # turn scan tower right to mantain object scan active
         self.scan_tower.turn_right()
         # turn lamp on
@@ -202,6 +203,7 @@ class NavegationMap():
             self.bot.move_backward()
             self.steps_forward -= 1
         self.go_right(backward=True)
+        self.bot.turn_center()
         while self.steps_left > 0:
             self.bot.move_backward()
             self.steps_left -= 1

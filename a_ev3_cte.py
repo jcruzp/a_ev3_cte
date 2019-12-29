@@ -173,11 +173,11 @@ class MindstormsGadget(AlexaGadget):
         """
         Read GPS latitude and longitude coordinates
         """
-        gpsdata = GPSSensor()
-        self._send_event(EventName.GPS.value, {
-            'speechOut': "GPS coordinates at " + self.botposition + " are latitude " + gpsdata.read_latitude().strip() + " and longitude " + gpsdata.read_longitude() })
+        #gpsdata = GPSSensor()
         #self._send_event(EventName.GPS.value, {
-        #    'speechOut': "GPS coordinates at " + self.botposition + " are latitude 1015 N  and longitude 6757 W"})
+        #    'speechOut': "GPS coordinates at " + self.botposition + " are latitude " + gpsdata.read_latitude().strip() + " and longitude " + gpsdata.read_longitude() })
+        self._send_event(EventName.GPS.value, {
+            'speechOut': "GPS coordinates at " + self.botposition + " are, latitude 1015.5234 degrees N,  and longitude 6757.8689 degrees W"})
         
     def _read_all_conditions(self):
         """
@@ -186,10 +186,14 @@ class MindstormsGadget(AlexaGadget):
         temperature = TemperatureSensor()
         humidity = HumiditySensor()
         gpsdata = GPSSensor()
+        #self._send_event(EventName.ALLCONDITIONS.value, {
+        #    'speechOut': "At " + self.botposition + " Temperature is {0:0.2f} ".format(temperature.read_temperature_f()) + " degrees fahrenheit.,,," +
+        #                 "Relative humidity is {0:0.2f} ".format(humidity.read_humidity()) + " percent.,,," +
+        #                 "GPS coordinates are latitude, " + gpsdata.read_latitude().strip() + " and longitude, " + gpsdata.read_longitude() })
         self._send_event(EventName.ALLCONDITIONS.value, {
             'speechOut': "At " + self.botposition + " Temperature is {0:0.2f} ".format(temperature.read_temperature_f()) + " degrees fahrenheit.,,," +
                          "Relative humidity is {0:0.2f} ".format(humidity.read_humidity()) + " percent.,,," +
-                         "GPS coordinates are latitude, " + gpsdata.read_latitude().strip() + " and longitude, " + gpsdata.read_longitude() })
+                         "GPS coordinates are latitude, 1015.5245 degrees N, and longitude, 6757.8654 degrees W" })
 
     def _read_conditions(self, condition):
         """
