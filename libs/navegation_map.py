@@ -279,31 +279,4 @@ class NavegationMap():
         if (tower_color == ColorScanOptions.BLUE.value):
             self.go_blue_tower()
 
-    # def exploring_towers(self):
-    #     """
-    #     Go to each tower and exploring using all sensors
-    #     """
-    #     logging.info('Begin exploring towers ...')
-    #     # Scan all initial towers position
-    #     self.scan_finding_towers()
-    #     # Go and scan each tower in established order
-    #     for tower in self.tower_order_list:
-    #         logging.info('Go tower...' + tower)
-    #         if tower == ColorScanOptions.RED.value:
-    #             self.go_red_tower()
-    #             # Scan all we need using sensors
-    #             # Scan and verify tower color
-    #            # logging.info('Verifying tower color ...' + self.color_arm.scan_color())
-    #             # print(color_arm.scan_color())
-    #             self.tower_red.temperature = self.temperature.read_temperature_f()
-    #             self.return_from_red_tower()
-    #         elif tower == ColorScanOptions.BLUE.value:
-    #             self.go_blue_tower()
-    #             # Scan all we need
-    #             self.tower_blue.temperature = self.temperature.read_temperature_f()
-    #             self.return_from_blue_tower()
-    #         elif tower == ColorScanOptions.YELLOW.value:
-    #             self.go_yellow_tower()
-    #             # Scan all we need
-    #             self.tower_yellow.temperature = self.temperature.read_temperature_f()
-    #             self.return_from_yellow_tower()
+   

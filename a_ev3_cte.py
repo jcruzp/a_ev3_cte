@@ -101,10 +101,7 @@ class MindstormsGadget(AlexaGadget):
 
         self.nav_map = NavegationMap()
 
-        # Start threads
-        #threading.Thread(target=self._patrol_thread, daemon=True).start()
-        #threading.Thread(target=self._proximity_thread, daemon=True).start()
-
+    
     def on_connected(self, device_addr):
         """
         Gadget connected to the paired Echo device.
@@ -173,12 +170,10 @@ class MindstormsGadget(AlexaGadget):
         """
         Read GPS latitude and longitude coordinates
         """
-        #gpsdata = GPSSensor()
-        #self._send_event(EventName.GPS.value, {
-        #    'speechOut': "GPS coordinates at " + self.botposition + " are latitude " + gpsdata.read_latitude().strip() + " and longitude " + gpsdata.read_longitude() })
+        gpsdata = GPSSensor()
         self._send_event(EventName.GPS.value, {
-            'speechOut': "GPS coordinates at " + self.botposition + " are, latitude 1015.5234 degrees N,  and longitude 6757.8689 degrees W"})
-        
+            'speechOut': "GPS coordinates at " + self.botposition + " are latitude " + gpsdata.read_latitude().strip() + " and longitude " + gpsdata.read_longitude() })
+               
     def _read_all_conditions(self):
         """
         Read all conditions
@@ -186,14 +181,11 @@ class MindstormsGadget(AlexaGadget):
         temperature = TemperatureSensor()
         humidity = HumiditySensor()
         gpsdata = GPSSensor()
-        #self._send_event(EventName.ALLCONDITIONS.value, {
-        #    'speechOut': "At " + self.botposition + " Temperature is {0:0.2f} ".format(temperature.read_temperature_f()) + " degrees fahrenheit.,,," +
-        #                 "Relative humidity is {0:0.2f} ".format(humidity.read_humidity()) + " percent.,,," +
-        #                 "GPS coordinates are latitude, " + gpsdata.read_latitude().strip() + " and longitude, " + gpsdata.read_longitude() })
         self._send_event(EventName.ALLCONDITIONS.value, {
             'speechOut': "At " + self.botposition + " Temperature is {0:0.2f} ".format(temperature.read_temperature_f()) + " degrees fahrenheit.,,," +
                          "Relative humidity is {0:0.2f} ".format(humidity.read_humidity()) + " percent.,,," +
-                         "GPS coordinates are latitude, 1015.5245 degrees N, and longitude, 6757.8654 degrees W" })
+                         "GPS coordinates are latitude, " + gpsdata.read_latitude().strip() + " and longitude, " + gpsdata.read_longitude() })
+       
 
     def _read_conditions(self, condition):
         """
