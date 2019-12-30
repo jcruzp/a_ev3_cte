@@ -7,6 +7,7 @@ Autonomous EV3 Color Tower Explorer is a lego robot that scan a field searching 
 At arrive each tower it check the right color, temperature, humidity, GPS position and some other variables at his location.
 
 Output_A = Color Arm Medium Motor - Yellow Leds
+
 Output_B = Scan Tower Large Motor - Red Leds
 Output_C = Car Engine Large Motor - Orange Leds
 Output_D = Steering Wheel Medium Motor - Green Leds
